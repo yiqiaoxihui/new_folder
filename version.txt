@@ -1,9 +1,13 @@
 {
-"apkDownloadUrl": "https://raw.githubusercontent.com/techGay/v9porn/master/apk/app-v1.0.8.apk",
+"apkDownloadUrl": "https://raw.githubusercontent.com/techGay/v9porn/master/apk/app-v1.0.9.apk",
 "updateMessage": "
-                  1. 修复适配JiaoZiVideoPlayer播放引擎\n
-                  2. 修复9*PORN除主页外其他分类打开崩溃的Bug
+1. 修复9*porn无法登陆问题\n
+2. 9*porn不用登录也可以查看作者的其他视频了\n
+3. 修复P*gav无法播放视频问题\n
+4. 修复九妹图社部分图集无法解析问题\n
+5. 增加A*gle视频搜索\n
+6. 其他改动调整及bug修复
 ",
-"versionCode": 9,
-"versionName": "1.0.8"
+"versionCode": 10,
+"versionName": "1.0.9"
 }

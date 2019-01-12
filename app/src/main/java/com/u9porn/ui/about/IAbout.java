@@ -18,4 +18,6 @@ public interface IAbout extends IBaseAbout {
     void cleanCacheFile(List<File> fileDirList);
 
     void countCacheFileSize(String title);
+
+    void commonQuestions();
 }

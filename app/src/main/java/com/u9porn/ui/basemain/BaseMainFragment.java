@@ -2,7 +2,6 @@ package com.u9porn.ui.basemain;
 
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,7 +25,6 @@ import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
 import com.chad.library.adapter.base.BaseViewHolder;
-import com.devbrackets.android.exomedia.util.ResourceUtil;
 import com.orhanobut.logger.Logger;
 import com.sdsmdg.tastytoast.TastyToast;
 import com.u9porn.BuildConfig;
@@ -121,8 +119,8 @@ public abstract class BaseMainFragment extends MvpFragment<BaseMainView, BaseMai
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         unbinder = ButterKnife.bind(this, view);
-        Drawable dropDownDrawable = ResourceUtil.tintList(context, R.drawable.ic_arrow_drop_down_black_24dp, R.color.common_always_white_text_color);
-        ivSortCategory.setImageDrawable(dropDownDrawable);
+//        Drawable dropDownDrawable = ResourceUtil.tintList(context, R.drawable.ic_arrow_drop_down_black_24dp, R.color.common_always_white_text_color);
+//        ivSortCategory.setImageDrawable(dropDownDrawable);
         ivSortCategory.setOnClickListener(this);
         mBaseMainFragmentAdapter.setDestroy(isNeedDestroy());
         viewPager.setAdapter(mBaseMainFragmentAdapter);
@@ -231,7 +229,6 @@ public abstract class BaseMainFragment extends MvpFragment<BaseMainView, BaseMai
             presenter.updateCategoryData(sortCategoryList);
             presenter.loadCategoryData(getCategoryType());
         }
-
         isNeedInterruptOnBackPressed = false;
     }
 

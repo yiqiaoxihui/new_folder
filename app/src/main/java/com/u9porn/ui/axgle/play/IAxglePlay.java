@@ -5,4 +5,6 @@ package com.u9porn.ui.axgle.play;
  */
 public interface IAxglePlay {
     void getPlayVideoUrl(String vid);
+
+    void loadSimilarVideo(String keyWord, boolean pullToRefresh);
 }

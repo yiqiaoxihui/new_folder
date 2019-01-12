@@ -3,6 +3,7 @@ package com.u9porn.data.network.apiservice;
 import com.u9porn.data.network.Api;
 
 import io.reactivex.Observable;
+import okhttp3.ResponseBody;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -60,6 +61,9 @@ public interface V9PornServiceApi {
     @GET("/v.php")
     Observable<String> recentUpdates(@Query("next") String next, @Query("page") Integer page, @Header("Referer") String referer);
 
+    @Headers({"Domain-Name: " + Api.PORN9_VIDEO_DOMAIN_NAME})
+    @GET("captcha.php")
+    Observable<ResponseBody> captcha();
     /**
      * @param username     用户名
      * @param password     密码

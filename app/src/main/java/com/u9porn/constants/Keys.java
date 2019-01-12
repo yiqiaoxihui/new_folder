@@ -22,5 +22,8 @@ public class Keys {
     public final static String KEY_INTENT_PICTURE_VIEWER_CURRENT_IMAGE_POSITION = "key_intent_picture_viewer_current_image_position";
     public final static String KEY_INTENT_MEI_ZI_TU_CONTENT_ID = "key_intent_mei_zi_tu_content_id";
 
+    public final static String KEY_INTENT_UPDATE = "key_intent_update";
+    public final static String KEY_INTENT_NOTICE = "key_intent_notice";
+
     public final static String KEY_SELECT_INDEX = "key_select_index";
 }

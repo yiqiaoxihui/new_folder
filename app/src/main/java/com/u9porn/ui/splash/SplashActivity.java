@@ -3,17 +3,18 @@ package com.u9porn.ui.splash;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
 import com.orhanobut.logger.Logger;
+import com.u9porn.BuildConfig;
 import com.u9porn.R;
-import com.u9porn.data.DataManager;
-import com.u9porn.data.model.User;
+import com.u9porn.constants.Keys;
+import com.u9porn.data.model.Notice;
+import com.u9porn.data.model.UpdateVersion;
 import com.u9porn.ui.MvpActivity;
 import com.u9porn.ui.main.MainActivity;
-import com.u9porn.ui.porn9video.user.UserPresenter;
-import com.u9porn.utils.AddressHelper;
-import com.u9porn.utils.UserHelper;
+import com.u9porn.utils.ApkVersionUtils;
+
+import java.io.Serializable;
 
 import javax.inject.Inject;
 
@@ -30,39 +31,14 @@ public class SplashActivity extends MvpActivity<SplashView, SplashPresenter> imp
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //防止重复开启程序造成多次登录
-        if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
-            //结束你的activity
-            Logger.t(TAG).d("重复打开了....");
-            finish();
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-            return;
-        }
-
-        if (presenter.isUserLogin()) {
-            startMain();
-        }
         setContentView(R.layout.activity_splash);
-        String username = presenter.getPorn9VideoLoginUserName();
-        String password = presenter.getPorn9VideoLoginUserPassword();
-
-        boolean isAutoLogin = presenter.isPorn9VideoUserAutoLogin();
-
-        if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password) && isAutoLogin && !TextUtils.isEmpty(presenter.getVideo9PornAddress())) {
-            String captcha = UserHelper.randomCaptcha();
-            login(username, password, captcha);
-        } else {
-            startMain();
-        }
+        findViewById(android.R.id.content).setPadding(0, 0, 0, 0);
+        checkUpdate();
     }
 
-    private void login(String username, String password, String captcha) {
-        presenter.login(username, password, captcha);
-    }
-
-    private void startMain() {
+    private void startMain(String key, Serializable serializable) {
         Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(key, serializable);
         startActivity(intent);
         finish();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -74,14 +50,65 @@ public class SplashActivity extends MvpActivity<SplashView, SplashPresenter> imp
         return splashPresenter;
     }
 
+
+    private void checkUpdate() {
+        int versionCode = ApkVersionUtils.getVersionCode(this);
+        if (versionCode == 0) {
+            Logger.t(TAG).d("获取应用本版失败");
+            return;
+        }
+        if (BuildConfig.DEBUG){
+            versionCode=1;
+        }
+        presenter.checkUpdate(versionCode);
+    }
+
+    private void checkNewNotice() {
+        presenter.checkNewNotice();
+    }
+
+
     @Override
-    public void loginSuccess(User user) {
-        startMain();
+    public void needUpdate(UpdateVersion updateVersion) {
+        int versionCode = presenter.getIgnoreUpdateVersionCode();
+        //如果保存的版本号等于当前要升级的版本号，表示用户已经选择不在提示，不显示提示对话框了
+        if (versionCode == updateVersion.getVersionCode()) {
+            return;
+        }
+        //有更新直接跳转主界面并提示更新，不检查公告
+        startMain(Keys.KEY_INTENT_UPDATE,updateVersion);
+    }
+
+
+    @Override
+    public void haveNewNotice(Notice notice) {
+        startMain(Keys.KEY_INTENT_NOTICE,notice);
     }
 
     @Override
-    public void loginError(String message) {
-        startMain();
+    public void noNewNotice() {
+        Logger.t(TAG).d("没有新公告");
+        startMain(null,null);
+    }
+
+    @Override
+    public void checkNewNoticeError(String message) {
+        Logger.t(TAG).d("检查新公告：" + message);
+        startMain(null,null);
+    }
+
+
+    @Override
+    public void noNeedUpdate() {
+        Logger.t(TAG).d("当前已是最新版本");
+        //没有更新在检查公告
+        checkNewNotice();
+    }
+
+    @Override
+    public void checkUpdateError(String message) {
+        Logger.t(TAG).d("检查更新错误：" + message);
+        checkNewNotice();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.u9porn.ui.porn9video.user;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -166,6 +167,16 @@ public class UserRegisterActivity extends MvpActivity<UserView, UserPresenter> i
     @Override
     public void registerFailure(String message) {
         showMessage(message, TastyToast.ERROR);
+    }
+
+    @Override
+    public void loadCaptchaSuccess(Bitmap bitmap) {
+
+    }
+
+    @Override
+    public void loadCaptchaFailure(String errorMessage, int code) {
+
     }
 
     @Override

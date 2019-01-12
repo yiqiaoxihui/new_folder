@@ -25,8 +25,6 @@ import com.helper.loadviewhelper.help.OnLoadViewListener;
 import com.helper.loadviewhelper.load.LoadViewHelper;
 import com.jaeger.library.StatusBarUtil;
 import com.orhanobut.logger.Logger;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.sdsmdg.tastytoast.TastyToast;
 import com.u9porn.R;
 import com.u9porn.adapter.PlayFragmentAdapter;
@@ -283,34 +281,7 @@ public abstract class BasePlayVideo extends MvpActivity<PlayVideoView, PlayVideo
         if (authorFragment != null) {
             authorFragment.setV9PornItem(v9PornItem);
         }
-        boolean neverAskForWatchDownloadTip = presenter.isNeverAskForWatchDownloadTip();
-        if (!neverAskForWatchDownloadTip) {
-            showWatchDownloadVideoTipDialog();
-        }
         dismissDialog();
-    }
-
-    private void showWatchDownloadVideoTipDialog() {
-        QMUIDialog.MessageDialogBuilder builder = new QMUIDialog.MessageDialogBuilder(this);
-        builder.setTitle("温馨提示");
-        builder.setMessage("1. 通常你无法在线观看视频就意味着你也无法下载视频，所以如果你不能在线观看视频就不要想着下载了再看了，那样绝大多数时候都是不能下载的；\n" +
-                "2. 如果在线观看速度慢可以选择先下载后再观看，因为是多线程下载，有时候能够比在线观看要快；\n" +
-                "3. 如果想要更好的在线观看和下载体验，目前最好的办法就是使用梯子（非设置中的HTTP代理）；\n" +
-                "4. 查看该作者其他视频（需要登录帐号）。");
-        builder.addAction("我知道了", new QMUIDialogAction.ActionListener() {
-            @Override
-            public void onClick(QMUIDialog dialog, int index) {
-                dialog.dismiss();
-            }
-        });
-        builder.addAction("不再提示", new QMUIDialogAction.ActionListener() {
-            @Override
-            public void onClick(QMUIDialog dialog, int index) {
-                dialog.dismiss();
-                presenter.setNeverAskForWatchDownloadTip(true);
-            }
-        });
-        builder.show();
     }
 
     @Override

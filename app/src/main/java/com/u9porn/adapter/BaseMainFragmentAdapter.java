@@ -13,7 +13,7 @@ import com.u9porn.ui.axgle.AxgleFragment;
 import com.u9porn.ui.images.huaban.HuaBanFragment;
 import com.u9porn.ui.images.meizitu.MeiZiTuFragment;
 import com.u9porn.ui.images.mm99.Mm99Fragment;
-import com.u9porn.ui.pav.PavFragment;
+import com.u9porn.ui.pxgav.PxgavFragment;
 import com.u9porn.ui.porn9forum.Forum9IndexFragment;
 import com.u9porn.ui.porn9forum.ForumFragment;
 import com.u9porn.ui.porn9video.index.IndexFragment;
@@ -105,8 +105,8 @@ public class BaseMainFragmentAdapter extends FragmentPagerAdapter {
                 MeiZiTuFragment meiZiTuFragment = MeiZiTuFragment.getInstance();
                 meiZiTuFragment.setCategory(category);
                 return meiZiTuFragment;
-            case Category.TYPE_PIG_AV:
-                PavFragment pigAvFragment = PavFragment.getInstance();
+            case Category.TYPE_PXG_AV:
+                PxgavFragment pigAvFragment = PxgavFragment.getInstance();
                 pigAvFragment.setCategory(category);
                 return pigAvFragment;
             case Category.TYPE_99_MM:

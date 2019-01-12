@@ -5,14 +5,16 @@ import com.u9porn.ui.about.AboutActivity;
 import com.u9porn.ui.about.AboutActivityModule;
 import com.u9porn.ui.axgle.play.AxglePlayActivity;
 import com.u9porn.ui.axgle.play.AxglePlayActivityModule;
+import com.u9porn.ui.axgle.search.SearchAxgleVideoActivity;
+import com.u9porn.ui.axgle.search.SearchAxgleVideoActivityModule;
 import com.u9porn.ui.download.DownloadActivity;
 import com.u9porn.ui.download.DownloadActivityModule;
 import com.u9porn.ui.images.viewimage.PictureViewerActivity;
 import com.u9porn.ui.images.viewimage.PictureViewerActivityModule;
 import com.u9porn.ui.main.MainActivity;
 import com.u9porn.ui.main.MainActivityModule;
-import com.u9porn.ui.pav.playpav.PlayPavActivity;
-import com.u9porn.ui.pav.playpav.PlayPavActivityModule;
+import com.u9porn.ui.pxgav.playpxgav.PlayPxgavActivity;
+import com.u9porn.ui.pxgav.playpxgav.PlayPxgavActivityModule;
 import com.u9porn.ui.porn9forum.browse9forum.Browse9PForumActivity;
 import com.u9porn.ui.porn9forum.browse9forum.Browse9PForumActivityModule;
 import com.u9porn.ui.porn9video.author.AuthorActivity;
@@ -100,8 +102,8 @@ public abstract class ActivityBindingModule {
     abstract ProxySettingActivity proxySettingActivity();
 
     @PerActivity
-    @ContributesAndroidInjector(modules = PlayPavActivityModule.class)
-    abstract PlayPavActivity playPavActivity();
+    @ContributesAndroidInjector(modules = PlayPxgavActivityModule.class)
+    abstract PlayPxgavActivity playPavActivity();
 
     @PerActivity
     @ContributesAndroidInjector(modules = PictureViewerActivityModule.class)
@@ -118,4 +120,8 @@ public abstract class ActivityBindingModule {
     @PerActivity
     @ContributesAndroidInjector(modules = AxglePlayActivityModule.class)
     abstract AxglePlayActivity axglePlayActivity();
+
+    @PerActivity
+    @ContributesAndroidInjector(modules = SearchAxgleVideoActivityModule.class)
+    abstract SearchAxgleVideoActivity searchAxgleVideoActivity();
 }

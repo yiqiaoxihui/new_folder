@@ -6,10 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import com.trello.lifecycle2.android.lifecycle.AndroidLifecycle;
 import com.trello.rxlifecycle2.LifecycleProvider;
 import com.u9porn.di.PerFragment;
-import com.u9porn.ui.about.AboutActivity;
 import com.u9porn.ui.axgle.AxgleFragment;
 import com.u9porn.ui.axgle.MainAxgleFragment;
-import com.u9porn.ui.basemain.BaseMainFragment;
 import com.u9porn.ui.images.Main99MmFragment;
 import com.u9porn.ui.images.MainHuaBanFragment;
 import com.u9porn.ui.images.MainMeiZiTuFragment;
@@ -18,8 +16,8 @@ import com.u9porn.ui.images.meizitu.MeiZiTuFragment;
 import com.u9porn.ui.images.mm99.Mm99Fragment;
 import com.u9porn.ui.mine.MineFragment;
 import com.u9porn.ui.music.MusicFragment;
-import com.u9porn.ui.pav.MainPavFragment;
-import com.u9porn.ui.pav.PavFragment;
+import com.u9porn.ui.pxgav.MainPxgavFragment;
+import com.u9porn.ui.pxgav.PxgavFragment;
 import com.u9porn.ui.porn9forum.Forum9IndexFragment;
 import com.u9porn.ui.porn9forum.ForumFragment;
 import com.u9porn.ui.porn9forum.Main9ForumFragment;
@@ -40,11 +38,11 @@ public abstract class MainActivityModule {
 
     @PerFragment
     @ContributesAndroidInjector
-    abstract PavFragment pavFragment();
+    abstract PxgavFragment pavFragment();
 
     @PerFragment
     @ContributesAndroidInjector
-    abstract MainPavFragment mainPavFragment();
+    abstract MainPxgavFragment mainPavFragment();
 
     @PerFragment
     @ContributesAndroidInjector

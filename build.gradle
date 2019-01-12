@@ -1,3 +1,4 @@
+apply from: "config.gradle"
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
@@ -8,7 +9,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0'
+        classpath 'com.android.tools.build:gradle:3.2.1'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
         classpath 'org.greenrobot:greendao-gradle-plugin:3.2.2' // add plugin
@@ -56,4 +57,5 @@ ext {
     exoPlayerVersion = "2.6.0"
     butterKnifeVersion = '8.8.1'
     daggerVersion = '2.16'
+    markwonVersion = '2.0.1'
 }

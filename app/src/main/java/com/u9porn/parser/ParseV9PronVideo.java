@@ -3,11 +3,11 @@ package com.u9porn.parser;
 import android.text.TextUtils;
 
 import com.orhanobut.logger.Logger;
-import com.u9porn.data.model.BaseResult;
 import com.u9porn.data.db.entity.V9PornItem;
+import com.u9porn.data.db.entity.VideoResult;
+import com.u9porn.data.model.BaseResult;
 import com.u9porn.data.model.User;
 import com.u9porn.data.model.VideoComment;
-import com.u9porn.data.db.entity.VideoResult;
 import com.u9porn.utils.StringUtils;
 
 import org.jsoup.Jsoup;
@@ -16,7 +16,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -271,7 +270,9 @@ public class ParseV9PronVideo {
         //新帐号注册成功登录后信息不一样，导致无法解析
         Element element = doc.getElementById("userinfo-title");
         if (element == null) {
-            return null;
+            user.setLogin(true);
+            user.setUserName("无法解析用户信息...");
+            return user;
         }
 
         //解析用户uid，2018年3月29日 似乎已经失效了,可在播放界面获取
@@ -285,7 +286,6 @@ public class ParseV9PronVideo {
         } else {
             Logger.t(TAG).d("无法解析用户uid");
         }
-
         String userInfoTitle = doc.getElementById("userinfo-title").text();
         String userName = StringUtils.subString(userInfoTitle, userInfoTitle.indexOf("欢迎") + 3, userInfoTitle.indexOf("用户状态"));
         Logger.t(TAG).d(userName);

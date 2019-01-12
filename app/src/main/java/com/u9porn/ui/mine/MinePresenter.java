@@ -68,4 +68,9 @@ public class MinePresenter extends MvpBasePresenter<MineView> implements IMine {
     public int getSettingScrollViewScrollPosition() {
         return dataManager.getSettingScrollViewScrollPosition();
     }
+
+    @Override
+    public boolean isFixMainNavigation() {
+        return dataManager.isFixMainNavigation();
+    }
 }

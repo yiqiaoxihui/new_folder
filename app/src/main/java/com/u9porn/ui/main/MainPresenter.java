@@ -1,12 +1,9 @@
 package com.u9porn.ui.main;
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 import com.u9porn.data.DataManager;
-import com.u9porn.data.model.Notice;
-import com.u9porn.data.model.UpdateVersion;
 import com.u9porn.ui.notice.NoticePresenter;
 import com.u9porn.ui.update.UpdatePresenter;
 
@@ -29,74 +26,10 @@ public class MainPresenter extends MvpBasePresenter<MainView> implements IMain {
         this.noticePresenter = noticePresenter;
     }
 
-    @Override
-    public void checkUpdate(int versionCode) {
-        updatePresenter.checkUpdate(versionCode, new UpdatePresenter.UpdateListener() {
-            @Override
-            public void needUpdate(final UpdateVersion updateVersion) {
-                ifViewAttached(new ViewAction<MainView>() {
-                    @Override
-                    public void run(@NonNull MainView view) {
-                        view.needUpdate(updateVersion);
-                    }
-                });
-            }
-
-            @Override
-            public void noNeedUpdate() {
-                ifViewAttached(new ViewAction<MainView>() {
-                    @Override
-                    public void run(@NonNull MainView view) {
-                        view.noNeedUpdate();
-                    }
-                });
-            }
-
-            @Override
-            public void checkUpdateError(final String message) {
-                ifViewAttached(new ViewAction<MainView>() {
-                    @Override
-                    public void run(@NonNull MainView view) {
-                        view.checkUpdateError(message);
-                    }
-                });
-            }
-        });
-    }
 
     @Override
-    public void checkNewNotice() {
-        noticePresenter.checkNewNotice(new NoticePresenter.CheckNewNoticeListener() {
-            @Override
-            public void haveNewNotice(final Notice notice) {
-                ifViewAttached(new ViewAction<MainView>() {
-                    @Override
-                    public void run(@NonNull MainView view) {
-                        view.haveNewNotice(notice);
-                    }
-                });
-            }
-
-            @Override
-            public void noNewNotice() {
-                ifViewAttached(new ViewAction<MainView>() {
-                    @Override
-                    public void run(@NonNull MainView view) {
-                        view.noNewNotice();
-                    }
-                });
-            }
-
-            @Override
-            public void checkNewNoticeError(final String message) {
-                ifViewAttached(new ViewAction<MainView>() {
-                    @Override
-                    public void run(@NonNull MainView view) {
-                        view.checkNewNoticeError(message);
-                    }
-                });
-            }
-        });
+    public void setIgnoreUpdateVersionCode(int versionCode) {
+        dataManager.setIgnoreUpdateVersionCode(versionCode);
     }
 
     @Override
@@ -105,32 +38,22 @@ public class MainPresenter extends MvpBasePresenter<MainView> implements IMain {
     }
 
     @Override
-    public int getIgnoreUpdateVersionCode() {
-        return dataManager.getIgnoreUpdateVersionCode();
-    }
-
-    @Override
-    public void setIgnoreUpdateVersionCode(int versionCode) {
-        dataManager.setIgnoreUpdateVersionCode(versionCode);
-    }
-
-    @Override
-    public void setMainSecondTabShow(int tabId) {
+    public void setMainSecondTabShow(String tabId) {
         dataManager.setMainSecondTabShow(tabId);
     }
 
     @Override
-    public int getMainSecondTabShow() {
+    public String getMainSecondTabShow() {
         return dataManager.getMainSecondTabShow();
     }
 
     @Override
-    public void setMainFirstTabShow(int tabId) {
+    public void setMainFirstTabShow(String tabId) {
         dataManager.setMainFirstTabShow(tabId);
     }
 
     @Override
-    public int getMainFirstTabShow() {
+    public String getMainFirstTabShow() {
         return dataManager.getMainFirstTabShow();
     }
 
@@ -167,5 +90,10 @@ public class MainPresenter extends MvpBasePresenter<MainView> implements IMain {
     @Override
     public void setPorn9ForumAddress(String porn9ForumAddress) {
         dataManager.setPorn9ForumAddress(porn9ForumAddress);
+    }
+
+    @Override
+    public boolean isFixMainNavigation() {
+        return dataManager.isFixMainNavigation();
     }
 }

@@ -1,6 +1,6 @@
 package com.u9porn.ui.main;
 
-import com.u9porn.ui.notice.NoticeView;
+import com.u9porn.ui.BaseView;
 
 /**
  *
@@ -8,5 +8,5 @@ import com.u9porn.ui.notice.NoticeView;
  * @date 2017/12/23
  */
 
-public interface MainView extends NoticeView {
+public interface MainView extends BaseView {
 }

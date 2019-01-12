@@ -1,5 +1,6 @@
 package com.u9porn.ui.main;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +20,7 @@ import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.devbrackets.android.exomedia.util.ResourceUtil;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.orhanobut.logger.Logger;
+import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
@@ -38,6 +40,7 @@ import com.u9porn.eventbus.UrlRedirectEvent;
 import com.u9porn.service.UpdateDownloadService;
 import com.u9porn.ui.MvpActivity;
 import com.u9porn.ui.axgle.MainAxgleFragment;
+import com.u9porn.ui.axgle.search.SearchAxgleVideoActivity;
 import com.u9porn.ui.basemain.BaseMainFragment;
 import com.u9porn.ui.download.DownloadActivity;
 import com.u9porn.ui.images.Main99MmFragment;
@@ -45,16 +48,16 @@ import com.u9porn.ui.images.MainHuaBanFragment;
 import com.u9porn.ui.images.MainMeiZiTuFragment;
 import com.u9porn.ui.mine.MineFragment;
 import com.u9porn.ui.music.MusicFragment;
-import com.u9porn.ui.pav.MainPavFragment;
 import com.u9porn.ui.porn9forum.Main9ForumFragment;
 import com.u9porn.ui.porn9video.Main9PronVideoFragment;
 import com.u9porn.ui.porn9video.search.SearchActivity;
 import com.u9porn.ui.porn9video.user.UserLoginActivity;
+import com.u9porn.ui.pxgav.MainPxgavFragment;
 import com.u9porn.ui.setting.SettingActivity;
-import com.u9porn.utils.ApkVersionUtils;
 import com.u9porn.utils.FragmentUtils;
 import com.u9porn.utils.NotificationChannelHelper;
 import com.u9porn.utils.SDCardUtils;
+import com.u9porn.utils.Tags;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.PermissionListener;
 import com.yanzhenjie.permission.Rationale;
@@ -65,6 +68,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -77,12 +81,7 @@ import butterknife.ButterKnife;
  * @author flymegoc
  */
 public class MainActivity extends MvpActivity<MainView, MainPresenter> implements MainView {
-    public final static int PORN9 = 2;
-    final int PAV = 3;
-    final int AXGLE = 4;
-    final int MEI_ZI_TU = 0;
-    final int MM_99 = 1;
-    final int HUA_BAN = 2;
+
     private static final String TAG = MainActivity.class.getSimpleName();
 
     @BindView(R.id.bottom_navigation_bar)
@@ -101,15 +100,18 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
     private Main9ForumFragment mMain9ForumFragment;
     private Main99MmFragment mMain99MmFragment;
     private MainHuaBanFragment mMainHuaBanFragment;
-    private MainPavFragment mMainPavFragment;
+    private MainPxgavFragment mMainPxgavFragment;
     private MusicFragment mMusicFragment;
     private MineFragment mMineFragment;
     private MainAxgleFragment mainAxgleFragment;
     private FragmentManager fragmentManager;
     private int selectIndex;
-    private int firstTabShow;
-    private int secondTabShow;
+    private String firstTabShow;
+    private String secondTabShow;
     private boolean isBackground = false;
+
+    private List<String> firstTagsArray = new ArrayList<>();
+    private List<String> secondTagsArray = new ArrayList<>();
 
     @Inject
     MainPresenter mainPresenter;
@@ -121,14 +123,24 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
         NotificationChannelHelper.initChannel(this);
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);
+        firstTagsArray.add(Tags.TAG_SEARCH_PORN_AXGLE_VIDEO);
+        firstTagsArray.add(Tags.TAG_MY_DOWNLOAD);
+        firstTagsArray.add(Tags.TAG_PRON_9_VIDEO);
+        firstTagsArray.add(Tags.TAG_PXGAV_VIDEO);
+        firstTagsArray.add(Tags.TAG_AXGLE_VIDEO);
+
+        secondTagsArray.add(Tags.TAG_MEI_ZI_TU);
+        secondTagsArray.add(Tags.TAG_MM_99);
+        secondTagsArray.add(Tags.TAG_HUA_BAN);
+
         fragmentManager = getSupportFragmentManager();
         selectIndex = getIntent().getIntExtra(Keys.KEY_SELECT_INDEX, 0);
         if (savedInstanceState != null) {
             selectIndex = savedInstanceState.getInt(Keys.KEY_SELECT_INDEX);
         }
+        handlerContentMargin();
         initBottomNavigationBar(selectIndex);
-        checkUpdate();
-        checkNewNotice();
+
         makeDirAndCheckPermission();
 
         fabSearch.setOnClickListener(new View.OnClickListener() {
@@ -142,16 +154,28 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
         secondTabShow = presenter.getMainSecondTabShow();
         doOnTabSelected(selectIndex);
         SophixManager.getInstance().queryAndLoadNewPatch();
+        checkNeedToShowUpdateOrNoticeDialog();
     }
 
+    private void checkNeedToShowUpdateOrNoticeDialog() {
+        UpdateVersion updateVersion = (UpdateVersion) getIntent().getSerializableExtra(Keys.KEY_INTENT_UPDATE);
+        if (updateVersion != null) {
+            showUpdateDialog(updateVersion);
+            return;
+        }
+        Notice notice = (Notice) getIntent().getSerializableExtra(Keys.KEY_INTENT_NOTICE);
+        if (notice != null) {
+            showNewNoticeDialog(notice);
+        }
+    }
 
     private void doOnFloatingActionButtonClick(@IntRange(from = 0, to = 4) int position) {
         switch (position) {
             case 0:
-                showVideoBottomSheet(firstTabShow);
+                showVideoBottomSheet(firstTagsArray.indexOf(firstTabShow));
                 break;
             case 1:
-                showPictureBottomSheet(secondTabShow);
+                showPictureBottomSheet(secondTagsArray.indexOf(secondTabShow));
                 break;
             case 2:
                 showForumBottomSheet(0);
@@ -167,26 +191,26 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
 
     private void showVideoBottomSheet(final int checkIndex) {
         new QMUIBottomSheet.BottomListSheetBuilder(this, true)
-                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_search_black_24dp), "搜索9*PORN视频")
-                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_file_download_black_24dp), "我的下载")
-                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_video_library_black_24dp), "9*PORN视频")
-                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_video_library_black_24dp), "ZhuGuLi视频")
-                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_video_library_black_24dp), "A*gle视频")
+                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_search_black_24dp), Tags.TAG_SEARCH_PORN_AXGLE_VIDEO)
+                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_my_download), Tags.TAG_MY_DOWNLOAD)
+                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_video_library_black_24dp), Tags.TAG_PRON_9_VIDEO)
+                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_video_library_black_24dp), Tags.TAG_PXGAV_VIDEO)
+                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_video_library_black_24dp), Tags.TAG_AXGLE_VIDEO)
                 .setCheckedIndex(checkIndex)
                 .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
                     @Override
                     public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
                         dialog.dismiss();
-                        switch (position) {
-                            case 0:
+                        switch (tag) {
+                            case Tags.TAG_SEARCH_PORN_AXGLE_VIDEO:
                                 goToSearchVideo();
                                 break;
-                            case 1:
+                            case Tags.TAG_MY_DOWNLOAD:
                                 Intent intent = new Intent(context, DownloadActivity.class);
                                 startActivityWithAnimation(intent);
                                 break;
                             default:
-                                handlerFirstTabClickToShow(position, selectIndex, true);
+                                handlerFirstTabClickToShow(tag, selectIndex, true);
                         }
                     }
                 })
@@ -196,15 +220,15 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
 
     private void showPictureBottomSheet(int checkIndex) {
         new QMUIBottomSheet.BottomListSheetBuilder(this, true)
-                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_photo_library_black_24dp), "妹子图")
-                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_photo_library_black_24dp), "九妹图社")
-                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_photo_library_black_24dp), "花瓣网")
+                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_photo_library_black_24dp), Tags.TAG_MEI_ZI_TU)
+                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_photo_library_black_24dp), Tags.TAG_MM_99)
+                .addItem(ResourceUtil.getDrawable(this, R.drawable.ic_photo_library_black_24dp), Tags.TAG_HUA_BAN)
                 .setCheckedIndex(checkIndex)
                 .setOnSheetItemClickListener(new QMUIBottomSheet.BottomListSheetBuilder.OnSheetItemClickListener() {
                     @Override
                     public void onClick(QMUIBottomSheet dialog, View itemView, int position, String tag) {
                         dialog.dismiss();
-                        handlerSecondTabClickToShow(position, selectIndex, true);
+                        handlerSecondTabClickToShow(tag, selectIndex, true);
                     }
                 })
                 .build()
@@ -255,9 +279,18 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
         });
         bottomNavigationBar.setBarBackgroundColor(R.color.bottom_navigation_bar_background);
         bottomNavigationBar.setFab(fabSearch);
+        bottomNavigationBar.setAutoHideEnabled(!presenter.isFixMainNavigation());
         bottomNavigationBar.initialise();
     }
 
+    private void handlerContentMargin() {
+        if (contentFrameLayout == null || bottomNavigationBar == null || !presenter.isFixMainNavigation()) {
+            return;
+        }
+        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) contentFrameLayout.getLayoutParams();
+        layoutParams.bottomMargin = QMUIDisplayHelper.getActionBarHeight(this);
+        contentFrameLayout.setLayoutParams(layoutParams);
+    }
 
     private void doOnTabSelected(@IntRange(from = 0, to = 4) int position) {
         switch (position) {
@@ -299,9 +332,9 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
         selectIndex = position;
     }
 
-    private void handlerFirstTabClickToShow(int position, int itemId, boolean isInnerReplace) {
-        switch (position) {
-            case PORN9:
+    private void handlerFirstTabClickToShow(String tag, int itemId, boolean isInnerReplace) {
+        switch (tag) {
+            case Tags.TAG_PRON_9_VIDEO:
                 if (presenter.haveNotSetV9pronAddress()) {
                     showNeedSetAddressDialog();
                     return;
@@ -310,24 +343,24 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
                     mMain9PronVideoFragment = Main9PronVideoFragment.getInstance();
                 }
                 mCurrentFragment = FragmentUtils.switchContent(fragmentManager, mCurrentFragment, mMain9PronVideoFragment, contentFrameLayout.getId(), itemId, isInnerReplace);
-                firstTabShow = PORN9;
-                presenter.setMainFirstTabShow(PORN9);
-                mMainPavFragment = null;
+                firstTabShow = Tags.TAG_PRON_9_VIDEO;
+                presenter.setMainFirstTabShow(Tags.TAG_PRON_9_VIDEO);
+                mMainPxgavFragment = null;
                 break;
-            case PAV:
+            case Tags.TAG_PXGAV_VIDEO:
                 if (presenter.haveNotSetPavAddress()) {
                     showNeedSetAddressDialog();
                     return;
                 }
-                if (mMainPavFragment == null) {
-                    mMainPavFragment = MainPavFragment.getInstance();
+                if (mMainPxgavFragment == null) {
+                    mMainPxgavFragment = MainPxgavFragment.getInstance();
                 }
-                mCurrentFragment = FragmentUtils.switchContent(fragmentManager, mCurrentFragment, mMainPavFragment, contentFrameLayout.getId(), itemId, isInnerReplace);
-                firstTabShow = PAV;
-                presenter.setMainFirstTabShow(PAV);
+                mCurrentFragment = FragmentUtils.switchContent(fragmentManager, mCurrentFragment, mMainPxgavFragment, contentFrameLayout.getId(), itemId, isInnerReplace);
+                firstTabShow = Tags.TAG_PXGAV_VIDEO;
+                presenter.setMainFirstTabShow(Tags.TAG_PXGAV_VIDEO);
                 mMain9PronVideoFragment = null;
                 break;
-            case AXGLE:
+            case Tags.TAG_AXGLE_VIDEO:
                 if (presenter.haveNotSetAxgleAddress()) {
                     return;
                 }
@@ -335,8 +368,8 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
                     mainAxgleFragment = MainAxgleFragment.getInstance();
                 }
                 mCurrentFragment = FragmentUtils.switchContent(fragmentManager, mCurrentFragment, mainAxgleFragment, contentFrameLayout.getId(), itemId, isInnerReplace);
-                firstTabShow = AXGLE;
-                presenter.setMainFirstTabShow(AXGLE);
+                firstTabShow = Tags.TAG_AXGLE_VIDEO;
+                presenter.setMainFirstTabShow(Tags.TAG_AXGLE_VIDEO);
                 break;
             default:
         }
@@ -363,37 +396,38 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
         builder.show();
     }
 
-    private void handlerSecondTabClickToShow(int position, int itemId, boolean isInnerReplace) {
-        switch (position) {
-            case MEI_ZI_TU:
+    private void handlerSecondTabClickToShow(String tag, int itemId, boolean isInnerReplace) {
+        switch (tag) {
+            case Tags.TAG_MEI_ZI_TU:
                 if (mMaiMeiZiTuFragment == null) {
                     mMaiMeiZiTuFragment = MainMeiZiTuFragment.getInstance();
                 }
                 mCurrentFragment = FragmentUtils.switchContent(fragmentManager, mCurrentFragment, mMaiMeiZiTuFragment, contentFrameLayout.getId(), itemId, isInnerReplace);
-                secondTabShow = MEI_ZI_TU;
-                presenter.setMainSecondTabShow(MEI_ZI_TU);
+                secondTabShow = Tags.TAG_MEI_ZI_TU;
+                presenter.setMainSecondTabShow(Tags.TAG_MEI_ZI_TU);
                 mMain99MmFragment = null;
                 mMainHuaBanFragment = null;
                 break;
-            case MM_99:
+            case Tags.TAG_MM_99:
                 if (mMain99MmFragment == null) {
                     mMain99MmFragment = Main99MmFragment.getInstance();
                 }
                 mCurrentFragment = FragmentUtils.switchContent(fragmentManager, mCurrentFragment, mMain99MmFragment, contentFrameLayout.getId(), itemId, isInnerReplace);
-                secondTabShow = MM_99;
-                presenter.setMainSecondTabShow(MM_99);
+                secondTabShow = Tags.TAG_MM_99;
+                presenter.setMainSecondTabShow(Tags.TAG_MM_99);
                 mMaiMeiZiTuFragment = null;
                 mMainHuaBanFragment = null;
                 break;
-            case HUA_BAN:
-                if (mMainHuaBanFragment == null) {
-                    mMainHuaBanFragment = MainHuaBanFragment.getInstance();
-                }
-                mCurrentFragment = FragmentUtils.switchContent(fragmentManager, mCurrentFragment, mMainHuaBanFragment, contentFrameLayout.getId(), itemId, isInnerReplace);
-                secondTabShow = HUA_BAN;
-                presenter.setMainSecondTabShow(HUA_BAN);
-                mMain99MmFragment = null;
-                mMaiMeiZiTuFragment = null;
+            case Tags.TAG_HUA_BAN:
+//                if (mMainHuaBanFragment == null) {
+//                    mMainHuaBanFragment = MainHuaBanFragment.getInstance();
+//                }
+//                mCurrentFragment = FragmentUtils.switchContent(fragmentManager, mCurrentFragment, mMainHuaBanFragment, contentFrameLayout.getId(), itemId, isInnerReplace);
+//                secondTabShow = HUA_BAN;
+//                presenter.setMainSecondTabShow(HUA_BAN);
+//                mMain99MmFragment = null;
+//                mMaiMeiZiTuFragment = null;
+                showMessage("暂停支持", TastyToast.INFO);
                 break;
             default:
         }
@@ -486,18 +520,6 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
         }
     };
 
-    private void checkUpdate() {
-        int versionCode = ApkVersionUtils.getVersionCode(this);
-        if (versionCode == 0) {
-            Logger.t(TAG).d("获取应用本版失败");
-            return;
-        }
-        presenter.checkUpdate(versionCode);
-    }
-
-    private void checkNewNotice() {
-        presenter.checkNewNotice();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -543,16 +565,34 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
     }
 
     private void goToSearchVideo() {
+        String[] items = {"搜9*Porn视频", "搜a*gle视频"};
+        new QMUIDialog.CheckableDialogBuilder(this)
+                .setTitle("搜索啥呀")
+                .addItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        switch (which) {
+                            case 0:
+                                if (!presenter.isUserLogin()) {
+                                    showMessage("请先登录", TastyToast.INFO);
+                                    Intent intent = new Intent(MainActivity.this, UserLoginActivity.class);
+                                    intent.putExtra(Keys.KEY_INTENT_LOGIN_FOR_ACTION, KeysActivityRequestResultCode.LOGIN_ACTION_FOR_SEARCH_91PRON_VIDEO);
+                                    startActivityForResultWithAnimation(intent, Constants.USER_LOGIN_REQUEST_CODE);
+                                    return;
+                                }
+                                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                                startActivityWithAnimation(intent);
+                                break;
+                            case 1:
+                                Intent axgleIntent = new Intent(MainActivity.this, SearchAxgleVideoActivity.class);
+                                startActivityWithAnimation(axgleIntent);
+                                break;
+                        }
+                    }
+                })
+                .show();
 
-        if (!presenter.isUserLogin()) {
-            showMessage("请先登录", TastyToast.INFO);
-            Intent intent = new Intent(MainActivity.this, UserLoginActivity.class);
-            intent.putExtra(Keys.KEY_INTENT_LOGIN_FOR_ACTION, KeysActivityRequestResultCode.LOGIN_ACTION_FOR_SEARCH_91PRON_VIDEO);
-            startActivityForResultWithAnimation(intent, Constants.USER_LOGIN_REQUEST_CODE);
-            return;
-        }
-        Intent intent = new Intent(this, SearchActivity.class);
-        startActivityWithAnimation(intent);
     }
 
     private void showUpdateDialog(final UpdateVersion updateVersion) {
@@ -586,31 +626,26 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
         builder.show();
     }
 
+    private void showNewNoticeDialog(final Notice notice) {
+        QMUIDialog.MessageDialogBuilder builder = new QMUIDialog.MessageDialogBuilder(this);
+        builder.setTitle("新公告");
+        builder.setMessage(notice.getNoticeMessage());
+        builder.addAction("我知道了", new QMUIDialogAction.ActionListener() {
+            @Override
+            public void onClick(QMUIDialog dialog, int index) {
+                dialog.dismiss();
+                presenter.saveNoticeVersionCode(notice.getVersionCode());
+            }
+        });
+        builder.show();
+    }
+
     @NonNull
     @Override
     public MainPresenter createPresenter() {
         return mainPresenter;
     }
 
-    @Override
-    public void needUpdate(UpdateVersion updateVersion) {
-        int versionCode = presenter.getIgnoreUpdateVersionCode();
-        //如果保存的版本号等于当前要升级的版本号，表示用户已经选择不在提示，不显示提示对话框了
-        if (versionCode == updateVersion.getVersionCode()) {
-            return;
-        }
-        showUpdateDialog(updateVersion);
-    }
-
-    @Override
-    public void noNeedUpdate() {
-        Logger.t(TAG).d("当前已是最新版本");
-    }
-
-    @Override
-    public void checkUpdateError(String message) {
-        Logger.t(TAG).d("检查更新错误：" + message);
-    }
 
     @Override
     public void showError(String message) {
@@ -631,36 +666,6 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
     public void showMessage(String msg, int type) {
         super.showMessage(msg, type);
     }
-
-    @Override
-    public void haveNewNotice(Notice notice) {
-        showNewNoticeDialog(notice);
-    }
-
-    private void showNewNoticeDialog(final Notice notice) {
-        QMUIDialog.MessageDialogBuilder builder = new QMUIDialog.MessageDialogBuilder(this);
-        builder.setTitle("新公告");
-        builder.setMessage(notice.getNoticeMessage());
-        builder.addAction("我知道了", new QMUIDialogAction.ActionListener() {
-            @Override
-            public void onClick(QMUIDialog dialog, int index) {
-                dialog.dismiss();
-                presenter.saveNoticeVersionCode(notice.getVersionCode());
-            }
-        });
-        builder.show();
-    }
-
-    @Override
-    public void noNewNotice() {
-        Logger.t(TAG).d("没有新公告");
-    }
-
-    @Override
-    public void checkNewNoticeError(String message) {
-        Logger.t(TAG).d("检查新公告：" + message);
-    }
-
 
     @Override
     protected void onResume() {
@@ -751,7 +756,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
     private void setNull(int position) {
         switch (position) {
             case 0:
-                mMainPavFragment = null;
+                mMainPxgavFragment = null;
                 mMain9PronVideoFragment = null;
                 break;
             case 1:

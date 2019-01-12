@@ -1,33 +1,34 @@
 package com.u9porn.data.network;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.orhanobut.logger.Logger;
+import com.u9porn.constants.Constants;
 import com.u9porn.data.cache.CacheProviders;
+import com.u9porn.data.db.entity.V9PornItem;
+import com.u9porn.data.db.entity.VideoResult;
 import com.u9porn.data.model.BaseResult;
-import com.u9porn.data.model.FavoriteJsonResult;
+import com.u9porn.data.model.F9PornContent;
 import com.u9porn.data.model.F9PronItem;
+import com.u9porn.data.model.FavoriteJsonResult;
 import com.u9porn.data.model.HuaBan;
 import com.u9porn.data.model.MeiZiTu;
 import com.u9porn.data.model.Mm99;
 import com.u9porn.data.model.Notice;
-import com.u9porn.data.model.pxgav.PavModel;
-import com.u9porn.data.model.pxgav.PavFormRequest;
-import com.u9porn.data.model.pxgav.PavLoadMoreResponse;
-import com.u9porn.data.model.pxgav.PavVideoParserJsonResult;
 import com.u9porn.data.model.PinnedHeaderEntity;
-import com.u9porn.data.model.F9PornContent;
 import com.u9porn.data.model.ProxyModel;
-import com.u9porn.data.db.entity.V9PornItem;
 import com.u9porn.data.model.UpdateVersion;
 import com.u9porn.data.model.User;
 import com.u9porn.data.model.VideoComment;
 import com.u9porn.data.model.VideoCommentResult;
-import com.u9porn.data.db.entity.VideoResult;
 import com.u9porn.data.model.axgle.Axgle;
 import com.u9porn.data.model.axgle.AxgleResponse;
-import com.u9porn.data.model.axgle.AxgleVideo;
+import com.u9porn.data.model.pxgav.PxgavLoadMoreResponse;
+import com.u9porn.data.model.pxgav.PxgavResultWithBlockId;
+import com.u9porn.data.model.pxgav.PxgavVideoParserJsonResult;
 import com.u9porn.data.network.apiservice.AxgleServiceApi;
 import com.u9porn.data.network.apiservice.Forum9PronServiceApi;
 import com.u9porn.data.network.apiservice.GitHubServiceApi;
@@ -35,25 +36,21 @@ import com.u9porn.data.network.apiservice.HuaBanServiceApi;
 import com.u9porn.data.network.apiservice.MeiZiTuServiceApi;
 import com.u9porn.data.network.apiservice.Mm99ServiceApi;
 import com.u9porn.data.network.apiservice.PavServiceApi;
-import com.u9porn.data.network.apiservice.V9PornServiceApi;
 import com.u9porn.data.network.apiservice.ProxyServiceApi;
+import com.u9porn.data.network.apiservice.V9PornServiceApi;
+import com.u9porn.data.network.okhttp.HeaderUtils;
+import com.u9porn.data.network.okhttp.MyProxySelector;
 import com.u9porn.exception.FavoriteException;
 import com.u9porn.exception.MessageException;
-import com.u9porn.parser.ParseV9PronVideo;
 import com.u9porn.parser.Parse99Mm;
 import com.u9porn.parser.ParseForum9Porn;
 import com.u9porn.parser.ParseMeiZiTu;
-import com.u9porn.parser.ParsePa;
 import com.u9porn.parser.ParseProxy;
+import com.u9porn.parser.ParsePxgav;
+import com.u9porn.parser.ParseV9PronVideo;
 import com.u9porn.rxjava.RetryWhenProcess;
 import com.u9porn.utils.AddressHelper;
-import com.u9porn.data.network.okhttp.HeaderUtils;
-import com.u9porn.data.network.okhttp.MyProxySelector;
 import com.u9porn.utils.UserHelper;
-import com.u9porn.constants.Constants;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import java.util.List;
 
@@ -81,9 +78,9 @@ public class AppApiHelper implements ApiHelper {
 
     private static final String TAG = AppApiHelper.class.getSimpleName();
 
-    private final static String CHECK_UPDATE_URL = "https://github.com/techGay/v9porn/blob/master/version.txt";
-    private final static String CHECK_NEW_NOTICE_URL = "https://github.com/techGay/v9porn/blob/master/notice.txt";
-
+    private final static String CHECK_UPDATE_URL = "https://raw.githubusercontent.com/techGay/v9porn/master/version.txt";
+    private final static String CHECK_NEW_NOTICE_URL = "https://raw.githubusercontent.com/techGay/v9porn/master/notice.txt";
+    private final static String COMMON_QUESTIONS_URL = "https://raw.githubusercontent.com/techGay/v9porn/master/COMMON_QUESTION.md";
     private CacheProviders cacheProviders;
 
     private V9PornServiceApi v9PornServiceApi;
@@ -374,6 +371,16 @@ public class AppApiHelper implements ApiHelper {
     }
 
     @Override
+    public Observable<Bitmap> porn9VideoLoginCaptcha() {
+        return v9PornServiceApi.captcha().map(new Function<ResponseBody, Bitmap>() {
+            @Override
+            public Bitmap apply(ResponseBody responseBody) throws Exception {
+                return BitmapFactory.decodeStream(responseBody.byteStream());
+            }
+        });
+    }
+
+    @Override
     public Observable<User> userLoginPorn9Video(String username, String password, String captcha) {
 
         String fingerprint = UserHelper.randomFingerprint();
@@ -462,9 +469,7 @@ public class AppApiHelper implements ApiHelper {
                 .map(new Function<String, UpdateVersion>() {
                     @Override
                     public UpdateVersion apply(String s) throws Exception {
-                        Document doc = Jsoup.parse(s);
-                        String text = doc.select("table.highlight").text();
-                        return gson.fromJson(text, UpdateVersion.class);
+                        return gson.fromJson(s, UpdateVersion.class);
                     }
                 });
     }
@@ -475,11 +480,14 @@ public class AppApiHelper implements ApiHelper {
                 .map(new Function<String, Notice>() {
                     @Override
                     public Notice apply(String s) throws Exception {
-                        Document doc = Jsoup.parse(s);
-                        String text = doc.select("table.highlight").text();
-                        return gson.fromJson(text, Notice.class);
+                        return gson.fromJson(s, Notice.class);
                     }
                 });
+    }
+
+    @Override
+    public Observable<String> commonQuestions() {
+        return gitHubServiceApi.commonQuestions(COMMON_QUESTIONS_URL);
     }
 
     @Override
@@ -560,7 +568,7 @@ public class AppApiHelper implements ApiHelper {
     }
 
     @Override
-    public Observable<List<PavModel>> loadPavListByCategory(String category, boolean pullToRefresh) {
+    public Observable<PxgavResultWithBlockId> loadPxgavListByCategory(String category, boolean pullToRefresh) {
         DynamicKey dynamicKey = new DynamicKey(category);
         EvictDynamicKey evictDynamicKey = new EvictDynamicKey(pullToRefresh);
         if ("index".equals(category)) {
@@ -571,35 +579,34 @@ public class AppApiHelper implements ApiHelper {
     }
 
     @Override
-    public Observable<List<PavModel>> loadMorePavListByCategory(String category, int page, boolean pullToRefresh) {
-        DynamicKeyGroup dynamicKeyGroup = new DynamicKeyGroup(category, page);
-        EvictDynamicKeyGroup evictDynamicKeyGroup = new EvictDynamicKeyGroup(pullToRefresh);
+    public Observable<PxgavResultWithBlockId> loadMorePxgavListByCategory(String category, int page, String lastBlockId, boolean pullToRefresh) {
+//        DynamicKeyGroup dynamicKeyGroup = new DynamicKeyGroup(category, page);
+//        EvictDynamicKeyGroup evictDynamicKeyGroup = new EvictDynamicKeyGroup(pullToRefresh);
         String action = "td_ajax_block";
-        PavFormRequest pavFormRequest = new PavFormRequest();
-        pavFormRequest.setCategory_id("672");
-        pavFormRequest.setLimit("10");
-        pavFormRequest.setSort("random_posts");
-        pavFormRequest.setAjax_pagination("load_more");
-        pavFormRequest.setTd_filter_default_txt("All");
-        pavFormRequest.setTd_column_number(3);
-        pavFormRequest.setF_header_font_title("Block header");
-        pavFormRequest.setF_ajax_font_title("Ajax categories");
-        pavFormRequest.setF_more_font_title("Load more button");
-        pavFormRequest.setMx4f_title_font_title("Article title");
-        pavFormRequest.setMx4f_cat_font_title("Article category tag");
-        pavFormRequest.setTd_filter_default_txt("所有");
-        pavFormRequest.setClassX("td_uid_11_5b793d4fdd2fa_rand");
-        pavFormRequest.setTdc_css_class("td_uid_11_5b793d4fdd2fa_rand");
-        pavFormRequest.setTdc_css_class_style("td_uid_11_5b793d4fdd2fa_rand_style");
-        String tdAtts = "{\"custom_title\":\"\",\"category_id\":\"672\",\"sort\":\"random_posts\",\"limit\":\"10\",\"ajax_pagination\":\"load_more\",\"separator\":\"\",\"custom_url\":\"\",\"block_template_id\":\"\",\"border_top\":\"\",\"color_preset\":\"\",\"mx4_tl\":\"\",\"post_ids\":\"\",\"category_ids\":\"\",\"tag_slug\":\"\",\"autors_id\":\"\",\"installed_post_types\":\"\",\"offset\":\"\",\"el_class\":\"\",\"td_ajax_filter_type\":\"\",\"td_ajax_filter_ids\":\"\",\"td_filter_default_txt\":\"All\",\"td_ajax_preloading\":\"\",\"f_header_font_header\":\"\",\"f_header_font_title\":\"Block header\",\"f_header_font_settings\":\"\",\"f_header_font_family\":\"\",\"f_header_font_size\":\"\",\"f_header_font_line_height\":\"\",\"f_header_font_style\":\"\",\"f_header_font_weight\":\"\",\"f_header_font_transform\":\"\",\"f_header_font_spacing\":\"\",\"f_header_\":\"\",\"f_ajax_font_title\":\"Ajax categories\",\"f_ajax_font_settings\":\"\",\"f_ajax_font_family\":\"\",\"f_ajax_font_size\":\"\",\"f_ajax_font_line_height\":\"\",\"f_ajax_font_style\":\"\",\"f_ajax_font_weight\":\"\",\"f_ajax_font_transform\":\"\",\"f_ajax_font_spacing\":\"\",\"f_ajax_\":\"\",\"f_more_font_title\":\"Load more button\",\"f_more_font_settings\":\"\",\"f_more_font_family\":\"\",\"f_more_font_size\":\"\",\"f_more_font_line_height\":\"\",\"f_more_font_style\":\"\",\"f_more_font_weight\":\"\",\"f_more_font_transform\":\"\",\"f_more_font_spacing\":\"\",\"f_more_\":\"\",\"mx4f_title_font_header\":\"\",\"mx4f_title_font_title\":\"Article title\",\"mx4f_title_font_settings\":\"\",\"mx4f_title_font_family\":\"\",\"mx4f_title_font_size\":\"\",\"mx4f_title_font_line_height\":\"\",\"mx4f_title_font_style\":\"\",\"mx4f_title_font_weight\":\"\",\"mx4f_title_font_transform\":\"\",\"mx4f_title_font_spacing\":\"\",\"mx4f_title_\":\"\",\"mx4f_cat_font_title\":\"Article category tag\",\"mx4f_cat_font_settings\":\"\",\"mx4f_cat_font_family\":\"\",\"mx4f_cat_font_size\":\"\",\"mx4f_cat_font_line_height\":\"\",\"mx4f_cat_font_style\":\"\",\"mx4f_cat_font_weight\":\"\",\"mx4f_cat_font_transform\":\"\",\"mx4f_cat_font_spacing\":\"\",\"mx4f_cat_\":\"\",\"ajax_pagination_infinite_stop\":\"\",\"css\":\"\",\"tdc_css\":\"\",\"td_column_number\":3,\"header_color\":\"\",\"class\":\"td_uid_10_5b7954c0d0e0f_rand\",\"tdc_css_class\":\"td_uid_10_5b7954c0d0e0f_rand\",\"tdc_css_class_style\":\"td_uid_10_5b7954c0d0e0f_rand_style\"}";
-        String tdBlockId = "td_uid_11_5b793d4fdd2fa";
+//        PxgavFormRequest pavFormRequest = new PxgavFormRequest();
+//        pavFormRequest.setCategory_id("672");
+//        pavFormRequest.setLimit("10");
+//        pavFormRequest.setSort("random_posts");
+//        pavFormRequest.setAjax_pagination("load_more");
+//        pavFormRequest.setTd_filter_default_txt("All");
+//        pavFormRequest.setTd_column_number(3);
+//        pavFormRequest.setF_header_font_title("Block header");
+//        pavFormRequest.setF_ajax_font_title("Ajax categories");
+//        pavFormRequest.setF_more_font_title("Load more button");
+//        pavFormRequest.setMx4f_title_font_title("Article title");
+//        pavFormRequest.setMx4f_cat_font_title("Article category tag");
+//        pavFormRequest.setTd_filter_default_txt("所有");
+//        pavFormRequest.setClassX("td_uid_11_5b793d4fdd2fa_rand");
+//        pavFormRequest.setTdc_css_class("td_uid_11_5b793d4fdd2fa_rand");
+//        pavFormRequest.setTdc_css_class_style("td_uid_11_5b793d4fdd2fa_rand_style");
+        String tdAtts = "{\"custom_title\":\"\",\"category_id\":\"\",\"sort\":\"random_posts\",\"limit\":\"10\",\"ajax_pagination\":\"load_more\",\"separator\":\"\",\"custom_url\":\"\",\"block_template_id\":\"\",\"border_top\":\"\",\"color_preset\":\"\",\"mx4_tl\":\"\",\"post_ids\":\"\",\"category_ids\":\"\",\"tag_slug\":\"\",\"autors_id\":\"\",\"installed_post_types\":\"\",\"offset\":\"\",\"el_class\":\"\",\"td_ajax_filter_type\":\"\",\"td_ajax_filter_ids\":\"\",\"td_filter_default_txt\":\"All\",\"td_ajax_preloading\":\"\",\"f_header_font_header\":\"\",\"f_header_font_title\":\"Block header\",\"f_header_font_settings\":\"\",\"f_header_font_family\":\"\",\"f_header_font_size\":\"\",\"f_header_font_line_height\":\"\",\"f_header_font_style\":\"\",\"f_header_font_weight\":\"\",\"f_header_font_transform\":\"\",\"f_header_font_spacing\":\"\",\"f_header_\":\"\",\"f_ajax_font_title\":\"Ajax categories\",\"f_ajax_font_settings\":\"\",\"f_ajax_font_family\":\"\",\"f_ajax_font_size\":\"\",\"f_ajax_font_line_height\":\"\",\"f_ajax_font_style\":\"\",\"f_ajax_font_weight\":\"\",\"f_ajax_font_transform\":\"\",\"f_ajax_font_spacing\":\"\",\"f_ajax_\":\"\",\"f_more_font_title\":\"Load more button\",\"f_more_font_settings\":\"\",\"f_more_font_family\":\"\",\"f_more_font_size\":\"\",\"f_more_font_line_height\":\"\",\"f_more_font_style\":\"\",\"f_more_font_weight\":\"\",\"f_more_font_transform\":\"\",\"f_more_font_spacing\":\"\",\"f_more_\":\"\",\"mx4f_title_font_header\":\"\",\"mx4f_title_font_title\":\"Article title\",\"mx4f_title_font_settings\":\"\",\"mx4f_title_font_family\":\"\",\"mx4f_title_font_size\":\"\",\"mx4f_title_font_line_height\":\"\",\"mx4f_title_font_style\":\"\",\"mx4f_title_font_weight\":\"\",\"mx4f_title_font_transform\":\"\",\"mx4f_title_font_spacing\":\"\",\"mx4f_title_\":\"\",\"mx4f_cat_font_title\":\"Article category tag\",\"mx4f_cat_font_settings\":\"\",\"mx4f_cat_font_family\":\"\",\"mx4f_cat_font_size\":\"\",\"mx4f_cat_font_line_height\":\"\",\"mx4f_cat_font_style\":\"\",\"mx4f_cat_font_weight\":\"\",\"mx4f_cat_font_transform\":\"\",\"mx4f_cat_font_spacing\":\"\",\"mx4f_cat_\":\"\",\"ajax_pagination_infinite_stop\":\"\",\"css\":\"\",\"tdc_css\":\"\",\"td_column_number\":3,\"header_color\":\"\",\"class\":\"" + lastBlockId + "_rand\",\"tdc_css_class\":\"" + lastBlockId + "_rand\",\"tdc_css_class_style\":\"" + lastBlockId + "_rand_style\"}";
         int tdColumnNumber = 3;
         String blockType = "td_block_16";
-        return actionMore(pavServiceApi.moreVideoList(action, tdAtts, tdBlockId, tdColumnNumber, page, blockType, "", ""), pullToRefresh);
+        return actionMore(pavServiceApi.moreVideoList(action, tdAtts, lastBlockId, tdColumnNumber, page, blockType, "", ""), pullToRefresh);
     }
 
     @Override
-    public Observable<PavVideoParserJsonResult> loadPavVideoUrl(String url, String pId, boolean pullToRefresh) {
+    public Observable<PxgavVideoParserJsonResult> loadPxgavVideoUrl(String url, String pId, boolean pullToRefresh) {
         if (TextUtils.isEmpty(pId)) {
             pId = "aaa1";
             pullToRefresh = true;
@@ -612,10 +619,10 @@ public class AppApiHelper implements ApiHelper {
                         return stringReply.getData();
                     }
                 })
-                .map(new Function<String, PavVideoParserJsonResult>() {
+                .map(new Function<String, PxgavVideoParserJsonResult>() {
                     @Override
-                    public PavVideoParserJsonResult apply(String s) throws Exception {
-                        return ParsePa.parserVideoUrl(s).getData();
+                    public PxgavVideoParserJsonResult apply(String s) throws Exception {
+                        return ParsePxgav.parserVideoUrl(s).getData();
                     }
                 });
     }
@@ -679,8 +686,8 @@ public class AppApiHelper implements ApiHelper {
                 .map(new Function<String, Boolean>() {
                     @Override
                     public Boolean apply(String s) throws Exception {
-                        BaseResult<List<PavModel>> baseResult = ParsePa.videoList(s);
-                        return baseResult.getData().size() != 0;
+                        BaseResult<PxgavResultWithBlockId> baseResult = ParsePxgav.videoList(s, false);
+                        return baseResult.getData().getPxgavModelList().size() != 0;
                     }
                 });
     }
@@ -726,13 +733,25 @@ public class AppApiHelper implements ApiHelper {
     }
 
     @Override
-    public Observable<List<AxgleVideo>> searchAxgleVideo() {
-        return null;
+    public Observable<AxgleResponse> searchAxgleVideo(String keyWord, int page) {
+        return axgleServiceApi.search(keyWord, page).map(new Function<String, AxgleResponse>() {
+            @Override
+            public AxgleResponse apply(String s) throws Exception {
+                Axgle axgle = gson.fromJson(s, Axgle.class);
+                return axgle.getResponse();
+            }
+        });
     }
 
     @Override
-    public Observable<List<AxgleVideo>> searchAxgleJavVideo() {
-        return null;
+    public Observable<AxgleResponse> searchAxgleJavVideo(String keyWord, int page) {
+        return axgleServiceApi.searchJav(keyWord, page).map(new Function<String, AxgleResponse>() {
+            @Override
+            public AxgleResponse apply(String s) throws Exception {
+                Axgle axgle = gson.fromJson(s, Axgle.class);
+                return axgle.getResponse();
+            }
+        });
     }
 
     @Override
@@ -740,20 +759,21 @@ public class AppApiHelper implements ApiHelper {
         return axgleServiceApi.getPlayVideoUrl(url);
     }
 
-    private Observable<List<PavModel>> actionMore(Observable<String> observable, final boolean pullToRefresh) {
+    private Observable<PxgavResultWithBlockId> actionMore(Observable<String> observable, final boolean pullToRefresh) {
         return observable
-                .map(new Function<String, List<PavModel>>() {
+                .map(new Function<String, PxgavResultWithBlockId>() {
                     @Override
-                    public List<PavModel> apply(String s) throws Exception {
-                        Logger.t(TAG).d(s);
-                        PavLoadMoreResponse pavLoadMoreResponse = gson.fromJson(s, PavLoadMoreResponse.class);
-                        BaseResult<List<PavModel>> baseResult = ParsePa.videoList(pavLoadMoreResponse.getTd_data());
+                    public PxgavResultWithBlockId apply(String s) throws Exception {
+                        Logger.t(TAG).d("p*gav 更多原始数据：" + s);
+                        PxgavLoadMoreResponse pxgavLoadMoreResponse = gson.fromJson(s, PxgavLoadMoreResponse.class);
+                        BaseResult<PxgavResultWithBlockId> baseResult = ParsePxgav.videoList(pxgavLoadMoreResponse.getTd_data(), true);
+                        baseResult.getData().setBlockId(pxgavLoadMoreResponse.getTd_block_id());
                         return baseResult.getData();
                     }
                 });
     }
 
-    private Observable<List<PavModel>> action(Observable<Reply<String>> observable) {
+    private Observable<PxgavResultWithBlockId> action(Observable<Reply<String>> observable) {
         return observable
                 .map(new Function<Reply<String>, String>() {
                     @Override
@@ -761,10 +781,10 @@ public class AppApiHelper implements ApiHelper {
                         return stringReply.getData();
                     }
                 })
-                .map(new Function<String, List<PavModel>>() {
+                .map(new Function<String, PxgavResultWithBlockId>() {
                     @Override
-                    public List<PavModel> apply(String s) throws Exception {
-                        BaseResult<List<PavModel>> baseResult = ParsePa.videoList(s);
+                    public PxgavResultWithBlockId apply(String s) throws Exception {
+                        BaseResult<PxgavResultWithBlockId> baseResult = ParsePxgav.videoList(s,false );
                         return baseResult.getData();
                     }
                 });

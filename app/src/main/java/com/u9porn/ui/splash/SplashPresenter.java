@@ -4,9 +4,10 @@ import android.support.annotation.NonNull;
 
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 import com.u9porn.data.DataManager;
-import com.u9porn.data.model.User;
-import com.u9porn.ui.porn9video.user.UserPresenter;
-import com.u9porn.utils.UserHelper;
+import com.u9porn.data.model.Notice;
+import com.u9porn.data.model.UpdateVersion;
+import com.u9porn.ui.notice.NoticePresenter;
+import com.u9porn.ui.update.UpdatePresenter;
 
 import javax.inject.Inject;
 
@@ -17,39 +18,14 @@ import javax.inject.Inject;
 
 public class SplashPresenter extends MvpBasePresenter<SplashView> implements ISplash {
 
-    private UserPresenter userPresenter;
     private DataManager dataManager;
-
+    private final UpdatePresenter updatePresenter;
+    private final NoticePresenter noticePresenter;
     @Inject
-    public SplashPresenter(UserPresenter userPresenter, DataManager dataManager) {
-        this.userPresenter = userPresenter;
+    public SplashPresenter(DataManager dataManager, UpdatePresenter updatePresenter, NoticePresenter noticePresenter) {
         this.dataManager = dataManager;
-    }
-
-    @Override
-    public void login(String username, String password, String captcha) {
-        userPresenter.login(username, password, captcha, new UserPresenter.LoginListener() {
-            @Override
-            public void loginSuccess(final User user) {
-                ifViewAttached(new ViewAction<SplashView>() {
-                    @Override
-                    public void run(@NonNull SplashView view) {
-                        user.copyProperties(dataManager.getUser());
-                        view.loginSuccess(user);
-                    }
-                });
-            }
-
-            @Override
-            public void loginFailure(final String message) {
-                ifViewAttached(new ViewAction<SplashView>() {
-                    @Override
-                    public void run(@NonNull SplashView view) {
-                        view.loginError(message);
-                    }
-                });
-            }
-        });
+        this.updatePresenter = updatePresenter;
+        this.noticePresenter = noticePresenter;
     }
 
     @Override
@@ -58,22 +34,83 @@ public class SplashPresenter extends MvpBasePresenter<SplashView> implements ISp
     }
 
     @Override
-    public String getPorn9VideoLoginUserName() {
-        return dataManager.getPorn9VideoLoginUserName();
-    }
-
-    @Override
-    public String getPorn9VideoLoginUserPassword() {
-        return dataManager.getPorn9VideoLoginUserPassword();
-    }
-
-    @Override
-    public boolean isPorn9VideoUserAutoLogin() {
-        return dataManager.isPorn9VideoUserAutoLogin();
-    }
-
-    @Override
     public String getVideo9PornAddress() {
         return dataManager.getPorn9VideoAddress();
+    }
+
+
+    @Override
+    public void checkUpdate(int versionCode) {
+        updatePresenter.checkUpdate(versionCode, new UpdatePresenter.UpdateListener() {
+            @Override
+            public void needUpdate(final UpdateVersion updateVersion) {
+                ifViewAttached(new ViewAction<SplashView>() {
+                    @Override
+                    public void run(@NonNull SplashView view) {
+                        view.needUpdate(updateVersion);
+                    }
+                });
+            }
+
+            @Override
+            public void noNeedUpdate() {
+                ifViewAttached(new ViewAction<SplashView>() {
+                    @Override
+                    public void run(@NonNull SplashView view) {
+                        view.noNeedUpdate();
+                    }
+                });
+            }
+
+            @Override
+            public void checkUpdateError(final String message) {
+                ifViewAttached(new ViewAction<SplashView>() {
+                    @Override
+                    public void run(@NonNull SplashView view) {
+                        view.checkUpdateError(message);
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public void checkNewNotice() {
+        noticePresenter.checkNewNotice(new NoticePresenter.CheckNewNoticeListener() {
+            @Override
+            public void haveNewNotice(final Notice notice) {
+                ifViewAttached(new ViewAction<SplashView>() {
+                    @Override
+                    public void run(@NonNull SplashView view) {
+                        view.haveNewNotice(notice);
+                    }
+                });
+            }
+
+            @Override
+            public void noNewNotice() {
+                ifViewAttached(new ViewAction<SplashView>() {
+                    @Override
+                    public void run(@NonNull SplashView view) {
+                        view.noNewNotice();
+                    }
+                });
+            }
+
+            @Override
+            public void checkNewNoticeError(final String message) {
+                ifViewAttached(new ViewAction<SplashView>() {
+                    @Override
+                    public void run(@NonNull SplashView view) {
+                        view.checkNewNoticeError(message);
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public int getIgnoreUpdateVersionCode() {
+        return dataManager.getIgnoreUpdateVersionCode();
     }
 }

@@ -62,10 +62,6 @@ public interface PreferencesHelper {
 
     int getProxyPort();
 
-    void setNeverAskForWatchDownloadTip(boolean neverAskForWatchDownloadTip);
-
-    boolean isNeverAskForWatchDownloadTip();
-
     void setIgnoreUpdateVersionCode(int versionCode);
 
     int getIgnoreUpdateVersionCode();
@@ -82,13 +78,13 @@ public interface PreferencesHelper {
 
     int getNoticeVersionCode();
 
-    void setMainFirstTabShow(int firstTabShow);
+    void setMainFirstTabShow(String firstTabShow);
 
-    int getMainFirstTabShow();
+    String getMainFirstTabShow();
 
-    void setMainSecondTabShow(int secondTabShow);
+    void setMainSecondTabShow(String secondTabShow);
 
-    int getMainSecondTabShow();
+    String getMainSecondTabShow();
 
     void setSettingScrollViewScrollPosition(int position);
 
@@ -109,4 +105,8 @@ public interface PreferencesHelper {
     void setAxgleAddress(String address);
 
     String getAxgleAddress();
+
+    boolean isFixMainNavigation();
+
+    void setFixMainNavigation(boolean fixMainNavigation);
 }

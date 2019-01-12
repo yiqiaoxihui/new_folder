@@ -22,4 +22,6 @@ public interface IMine {
     void setSettingScrollViewScrollPosition(int settingScrollViewScrollPosition);
 
     int getSettingScrollViewScrollPosition();
+
+    boolean isFixMainNavigation();
 }

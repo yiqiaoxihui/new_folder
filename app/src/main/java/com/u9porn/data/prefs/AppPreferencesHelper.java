@@ -8,9 +8,9 @@ import android.util.Base64;
 
 import com.u9porn.di.ApplicationContext;
 import com.u9porn.di.PreferenceInfo;
-import com.u9porn.ui.main.MainActivity;
 import com.u9porn.utils.PlaybackEngine;
 import com.u9porn.utils.SDCardUtils;
+import com.u9porn.utils.Tags;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -43,12 +43,13 @@ public class AppPreferencesHelper implements PreferencesHelper {
     private final static String KEY_SP_FORBIDDEN_AUTO_RELEASE_MEMORY_WHEN_LOW_MEMORY = "key_sp_forbidden_auto_release_memory_when_low_memory";
     private final static String KEY_SP_VIEW_91_PORN_FORUM_CONTENT_SHOW_TIP = "key_sp_view_91_porn_forum_content_show_tip";
     private final static String KEY_SP_NOTICE_VERSION_CODE = "key_sp_notice_version_code";
-    private final static String KEY_SP_FIRST_TAB_SHOW = "key_sp_first_tab_show";
-    private final static String KEY_SP_SECOND_TAB_SHOW = "key_sp_second_tab_show";
+    private final static String KEY_SP_FIRST_TAB_SHOW = "key_sp_first_tab_show_str";
+    private final static String KEY_SP_SECOND_TAB_SHOW = "key_sp_second_tab_show_str";
     private final static String KEY_SP_SETTING_SCROLLVIEW_SCROLL_POSITION = "key_sp_setting_scrollview_scroll_position";
     private final static String KEY_SP_OPEN_SKIP_PAGE = "key_sp_open_skip_page";
     private final static String KEY_SP_CUSTOM_DOWNLOAD_VIDEO_DIR_PATH = "key_sp_custom_download_video_dir_path";
     private final static String KEY_SP_SHOW_URL_REDIRECT_TIP_DIALOG = "key_sp_show_url_redirect_tip_dialog";
+    private final static String KEY_SP_FIX_MAIN_NAVIGATION = "key_sp_fix_main_navigation";
 
     private final SharedPreferences mPrefs;
 
@@ -208,16 +209,6 @@ public class AppPreferencesHelper implements PreferencesHelper {
     }
 
     @Override
-    public void setNeverAskForWatchDownloadTip(boolean neverAskForWatchDownloadTip) {
-        mPrefs.edit().putBoolean(KEY_SP_NEVER_ASK_FOR_WATCH_DOWNLOAD_TIP, neverAskForWatchDownloadTip).apply();
-    }
-
-    @Override
-    public boolean isNeverAskForWatchDownloadTip() {
-        return mPrefs.getBoolean(KEY_SP_NEVER_ASK_FOR_WATCH_DOWNLOAD_TIP, false);
-    }
-
-    @Override
     public void setIgnoreUpdateVersionCode(int versionCode) {
         mPrefs.edit().putInt(KEY_SP_IGNORE_THIS_VERSION_UPDATE_TIP, versionCode).apply();
     }
@@ -258,23 +249,23 @@ public class AppPreferencesHelper implements PreferencesHelper {
     }
 
     @Override
-    public void setMainFirstTabShow(int firstTabShow) {
-        mPrefs.edit().putInt(KEY_SP_FIRST_TAB_SHOW, firstTabShow).apply();
+    public void setMainFirstTabShow(String firstTabShow) {
+        mPrefs.edit().putString(KEY_SP_FIRST_TAB_SHOW, firstTabShow).apply();
     }
 
     @Override
-    public int getMainFirstTabShow() {
-        return mPrefs.getInt(KEY_SP_FIRST_TAB_SHOW, MainActivity.PORN9);
+    public String getMainFirstTabShow() {
+        return mPrefs.getString(KEY_SP_FIRST_TAB_SHOW, Tags.TAG_PRON_9_VIDEO);
     }
 
     @Override
-    public void setMainSecondTabShow(int secondTabShow) {
-        mPrefs.edit().putInt(KEY_SP_SECOND_TAB_SHOW, secondTabShow).apply();
+    public void setMainSecondTabShow(String secondTabShow) {
+        mPrefs.edit().putString(KEY_SP_SECOND_TAB_SHOW, secondTabShow).apply();
     }
 
     @Override
-    public int getMainSecondTabShow() {
-        return mPrefs.getInt(KEY_SP_SECOND_TAB_SHOW, 0);
+    public String getMainSecondTabShow() {
+        return mPrefs.getString(KEY_SP_SECOND_TAB_SHOW, Tags.TAG_MEI_ZI_TU);
     }
 
     @Override
@@ -332,5 +323,15 @@ public class AppPreferencesHelper implements PreferencesHelper {
     @Override
     public String getAxgleAddress() {
         return mPrefs.getString(KEY_SP_AXGLE_ADDRESS, "");
+    }
+
+    @Override
+    public boolean isFixMainNavigation() {
+        return mPrefs.getBoolean(KEY_SP_FIX_MAIN_NAVIGATION, false);
+    }
+
+    @Override
+    public void setFixMainNavigation(boolean fixMainNavigation) {
+        mPrefs.edit().putBoolean(KEY_SP_FIX_MAIN_NAVIGATION, fixMainNavigation).apply();
     }
 }

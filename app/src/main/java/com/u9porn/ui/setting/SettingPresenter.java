@@ -7,16 +7,13 @@ import android.text.TextUtils;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.trello.rxlifecycle2.LifecycleProvider;
-import com.u9porn.cookie.CookieManager;
 import com.u9porn.data.DataManager;
-import com.u9porn.data.model.User;
 import com.u9porn.data.network.Api;
 import com.u9porn.rxjava.CallBackWrapper;
 import com.u9porn.rxjava.RxSchedulersHelper;
 import com.u9porn.ui.MvpBasePresenter;
 import com.u9porn.ui.porn9video.search.SearchPresenter;
 import com.u9porn.utils.SDCardUtils;
-import com.u9porn.utils.UserHelper;
 
 import java.io.File;
 import java.util.concurrent.Callable;
@@ -425,5 +422,15 @@ public class SettingPresenter extends MvpBasePresenter<SettingView> implements I
     @Override
     public String getAxgleAddress() {
         return dataManager.getAxgleAddress();
+    }
+
+    @Override
+    public boolean isFixMainNavigation() {
+        return dataManager.isFixMainNavigation();
+    }
+
+    @Override
+    public void setFixMainNavigation(boolean fixMainNavigation) {
+        dataManager.setFixMainNavigation(fixMainNavigation);
     }
 }

@@ -41,7 +41,7 @@
     <string name="address_v9porn">设置9*PORN视频地址</string>
     <string name="address_forum_9porn">设置9*PORN论坛地址</string>
     <string name="address_t6y">设置CaoLiu地址</string>
-    <string name="address_pa">设置ZhuGuLi视频地址</string>
+    <string name="address_pa">设置P*gav视频地址</string>
     <string name="about_item_clean_cache">清除缓存</string>
     <string name="proxy_setting">HTTP代理</string>
     <string name="night_mode">夜间模式</string>
@@ -77,4 +77,5 @@
     <string name="author">作者：</string>
     <string name="send_icon">sendIcon</string>
     <string name="address_axgle">设置A*gle的API地址</string>
+    <string name="search_jav_video">搜Jav视频</string>
 </resources>

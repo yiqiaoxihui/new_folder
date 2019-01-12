@@ -2,7 +2,7 @@ package com.u9porn.ui.porn9video.user;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -16,21 +16,21 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.orhanobut.logger.Logger;
+import com.devbrackets.android.exomedia.util.ResourceUtil;
 import com.qmuiteam.qmui.util.QMUIKeyboardHelper;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.sdsmdg.tastytoast.TastyToast;
 import com.u9porn.R;
+import com.u9porn.constants.Keys;
 import com.u9porn.constants.KeysActivityRequestResultCode;
+import com.u9porn.data.DataManager;
 import com.u9porn.data.model.User;
 import com.u9porn.ui.MvpActivity;
 import com.u9porn.ui.porn9video.favorite.FavoriteActivity;
 import com.u9porn.ui.porn9video.search.SearchActivity;
 import com.u9porn.ui.setting.SettingActivity;
 import com.u9porn.utils.DialogUtils;
-import com.u9porn.utils.GlideApp;
-import com.u9porn.constants.Keys;
 
 import javax.inject.Inject;
 
@@ -57,16 +57,18 @@ public class UserLoginActivity extends MvpActivity<UserView, UserPresenter> impl
     Toolbar toolbar;
     @BindView(R.id.cb_remember_password)
     CheckBox cbRememberPassword;
-    @BindView(R.id.cb_auto_login)
-    CheckBox cbAutoLogin;
 
     private AlertDialog alertDialog;
     private String username;
     private String password;
     private int loginForAction;
 
+
     @Inject
     UserPresenter userPresenter;
+
+    @Inject
+    DataManager dataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +76,7 @@ public class UserLoginActivity extends MvpActivity<UserView, UserPresenter> impl
         setContentView(R.layout.activity_user_login);
         ButterKnife.bind(this);
         initToolBar(toolbar);
+
         loginForAction = getIntent().getIntExtra(Keys.KEY_INTENT_LOGIN_FOR_ACTION, 0);
         if (!TextUtils.isEmpty(presenter.getVideo9PornAddress())) {
             loadCaptcha();
@@ -94,17 +97,17 @@ public class UserLoginActivity extends MvpActivity<UserView, UserPresenter> impl
             }
         });
 
-        cbAutoLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (cbAutoLogin.isChecked()) {
-                    cbAutoLogin.setChecked(true);
-                    cbRememberPassword.setChecked(true);
-                } else {
-                    cbAutoLogin.setChecked(false);
-                }
-            }
-        });
+//        cbAutoLogin.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (cbAutoLogin.isChecked()) {
+//                    cbAutoLogin.setChecked(true);
+//                    cbRememberPassword.setChecked(true);
+//                } else {
+//                    cbAutoLogin.setChecked(false);
+//                }
+//            }
+//        });
 
         cbRememberPassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,7 +116,7 @@ public class UserLoginActivity extends MvpActivity<UserView, UserPresenter> impl
                     cbRememberPassword.setChecked(true);
                 } else {
                     cbRememberPassword.setChecked(false);
-                    cbAutoLogin.setChecked(false);
+                    // cbAutoLogin.setChecked(false);
                 }
             }
         });
@@ -132,8 +135,8 @@ public class UserLoginActivity extends MvpActivity<UserView, UserPresenter> impl
         if (!TextUtils.isEmpty(password)) {
             cbRememberPassword.setChecked(true);
         }
-        boolean isAutoLogin = presenter.isAutoLogin();
-        cbAutoLogin.setChecked(isAutoLogin);
+        //boolean isAutoLogin = presenter.isAutoLogin();
+        //cbAutoLogin.setChecked(isAutoLogin);
 
         etAccount.setText(username);
         etPassword.setText(password);
@@ -161,11 +164,7 @@ public class UserLoginActivity extends MvpActivity<UserView, UserPresenter> impl
      * 加载验证码，目前似乎是非必须，不填也是可以登录的
      */
     private void loadCaptcha() {
-        String url = presenter.getVideo9PornAddress() + "captcha.php";
-
-        Logger.t(TAG).d("验证码链接：" + url);
-        Uri uri = Uri.parse(url);
-        GlideApp.with(this).load(uri).placeholder(R.drawable.placeholder).transition(new DrawableTransitionOptions().crossFade(300)).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).into(captchaImageView);
+        presenter.loadCaptcha();
     }
 
     @NonNull
@@ -207,7 +206,7 @@ public class UserLoginActivity extends MvpActivity<UserView, UserPresenter> impl
     @Override
     public void loginSuccess(User user) {
 
-        presenter.saveUserInfoPrf(username, password, cbRememberPassword.isChecked(), cbAutoLogin.isChecked());
+        presenter.saveUserInfoPrf(username, password, cbRememberPassword.isChecked(), false);
         showMessage("登录成功", TastyToast.SUCCESS);
         switchWhereToGo();
     }
@@ -255,8 +254,19 @@ public class UserLoginActivity extends MvpActivity<UserView, UserPresenter> impl
     }
 
     @Override
-    public void showError(String message) {
+    public void loadCaptchaSuccess(Bitmap bitmap) {
+        captchaImageView.setImageBitmap(bitmap);
+    }
 
+    @Override
+    public void loadCaptchaFailure(String errorMessage, int code) {
+        captchaImageView.setImageDrawable(ResourceUtil.getDrawable(this, R.drawable.ic_refresh));
+        showError("无法加载验证码,点击刷新重试");
+    }
+
+    @Override
+    public void showError(String message) {
+        showMessage(message, TastyToast.ERROR);
     }
 
     @Override
@@ -296,8 +306,15 @@ public class UserLoginActivity extends MvpActivity<UserView, UserPresenter> impl
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_user_register) {
-            Intent intent = new Intent(this, UserRegisterActivity.class);
-            startActivityWithAnimation(intent);
+            new QMUIDialog.MessageDialogBuilder(this)
+                    .setMessage("注册功能已停止支持，请去9*porn官网注册，之后再来登录！")
+                    .addAction("知道了", new QMUIDialogAction.ActionListener() {
+                        @Override
+                        public void onClick(QMUIDialog dialog, int index) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
             return true;
         }
 

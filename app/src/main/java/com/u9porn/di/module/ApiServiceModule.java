@@ -3,16 +3,33 @@ package com.u9porn.di.module;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.orhanobut.logger.Logger;
+import com.u9porn.cookie.RulerCookie;
 import com.u9porn.cookie.SetCookieCache;
 import com.u9porn.cookie.SharedPrefsCookiePersistor;
 import com.u9porn.data.network.Api;
-import com.u9porn.data.network.apiservice.*;
+import com.u9porn.data.network.apiservice.AxgleServiceApi;
+import com.u9porn.data.network.apiservice.Forum9PronServiceApi;
+import com.u9porn.data.network.apiservice.GitHubServiceApi;
+import com.u9porn.data.network.apiservice.HuaBanServiceApi;
+import com.u9porn.data.network.apiservice.MeiZiTuServiceApi;
+import com.u9porn.data.network.apiservice.Mm99ServiceApi;
+import com.u9porn.data.network.apiservice.PavServiceApi;
+import com.u9porn.data.network.apiservice.ProxyServiceApi;
+import com.u9porn.data.network.apiservice.V9PornServiceApi;
 import com.u9porn.data.network.okhttp.CommonHeaderInterceptor;
 import com.u9porn.data.network.okhttp.MyProxySelector;
 import com.u9porn.di.ApplicationContext;
 import com.u9porn.utils.AddressHelper;
+
+import java.net.Proxy;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
 import me.jessyan.retrofiturlmanager.RetrofitUrlManager;
@@ -21,11 +38,6 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
-
-import javax.inject.Singleton;
-import java.net.Proxy;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author flymegoc
@@ -66,7 +78,7 @@ public class ApiServiceModule {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
             @Override
             public void log(@NonNull String message) {
-                Logger.t(TAG).d("HttpLog:" + message);
+                Logger.t(TAG).d(message);
             }
         });
         logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
@@ -87,6 +99,7 @@ public class ApiServiceModule {
         builder.addInterceptor(httpLoggingInterceptor);
         builder.cookieJar(rulerCookie);
         builder.proxySelector(myProxySelector);
+       // builder.sslSocketFactory(new TLSSocketFactory(),TLSSocketFactory.DEFAULT_TRUST_MANAGERS);
         //动态baseUrl
         RetrofitUrlManager.getInstance().putDomain(Api.GITHUB_DOMAIN_NAME, Api.APP_GITHUB_DOMAIN);
         RetrofitUrlManager.getInstance().putDomain(Api.MEI_ZI_TU_DOMAIN_NAME, Api.APP_MEIZITU_DOMAIN);

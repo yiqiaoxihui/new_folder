@@ -19,8 +19,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="10dp"
-            app:backgroundTint="@color/floating_action_button_tine_bg_color"
             android:tint="@color/colorPrimary"
+            app:backgroundTint="@color/floating_action_button_tine_bg_color"
             app:srcCompat="@drawable/ic_add_black_24dp" />
 
         <com.ashokvarma.bottomnavigation.BottomNavigationBar

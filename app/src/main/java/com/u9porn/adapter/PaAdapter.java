@@ -7,7 +7,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.u9porn.R;
-import com.u9porn.data.model.pxgav.PavModel;
+import com.u9porn.data.model.pxgav.PxgavModel;
 import com.u9porn.utils.GlideApp;
 
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import java.util.Map;
  * @date 2018/1/30
  */
 
-public class PaAdapter extends BaseQuickAdapter<PavModel, BaseViewHolder> {
+public class PaAdapter extends BaseQuickAdapter<PxgavModel, BaseViewHolder> {
     private Map<String, Integer> heightMap = new HashMap<>();
     private int width;
 
@@ -31,7 +31,7 @@ public class PaAdapter extends BaseQuickAdapter<PavModel, BaseViewHolder> {
     }
 
     @Override
-    protected void convert(BaseViewHolder helper, PavModel item) {
+    protected void convert(BaseViewHolder helper, PxgavModel item) {
         helper.setText(R.id.tv_item_pig_av_title, item.getTitle());
         int height;
         if (!heightMap.containsKey(item.getImgUrl())) {

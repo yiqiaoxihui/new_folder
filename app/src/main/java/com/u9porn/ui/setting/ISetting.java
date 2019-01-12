@@ -66,4 +66,8 @@ public interface ISetting {
     void setAxgleAddress(String address);
 
     String getAxgleAddress();
+
+    boolean isFixMainNavigation();
+
+    void setFixMainNavigation(boolean fixMainNavigation);
 }

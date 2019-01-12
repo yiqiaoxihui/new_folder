@@ -7,9 +7,11 @@ import android.support.annotation.NonNull;
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 import com.orhanobut.logger.Logger;
 import com.trello.rxlifecycle2.LifecycleProvider;
+import com.u9porn.data.DataManager;
 import com.u9porn.data.model.UpdateVersion;
 import com.u9porn.di.ApplicationContext;
 import com.u9porn.rxjava.CallBackWrapper;
+import com.u9porn.rxjava.RxSchedulersHelper;
 import com.u9porn.ui.update.UpdatePresenter;
 import com.u9porn.utils.AppCacheUtils;
 import com.u9porn.utils.GlideApp;
@@ -37,12 +39,14 @@ public class AboutPresenter extends MvpBasePresenter<AboutView> implements IAbou
     private UpdatePresenter updatePresenter;
     private LifecycleProvider<Lifecycle.Event> provider;
     private Context context;
+    private final DataManager dataManager;
 
     @Inject
-    public AboutPresenter(UpdatePresenter updatePresenter, LifecycleProvider<Lifecycle.Event> provider, @ApplicationContext Context context) {
+    public AboutPresenter(UpdatePresenter updatePresenter, LifecycleProvider<Lifecycle.Event> provider, @ApplicationContext Context context, DataManager dataManager) {
         this.updatePresenter = updatePresenter;
         this.provider = provider;
         this.context = context;
+        this.dataManager = dataManager;
     }
 
     @Override
@@ -175,6 +179,34 @@ public class AboutPresenter extends MvpBasePresenter<AboutView> implements IAbou
                             @Override
                             public void run(@NonNull AboutView view) {
                                 view.countCacheFileSizeError("计算缓存大小失败了");
+                            }
+                        });
+                    }
+                });
+    }
+
+    @Override
+    public void commonQuestions() {
+        dataManager.commonQuestions()
+                .compose(RxSchedulersHelper.<String>ioMainThread())
+                .compose(provider.<String>bindUntilEvent(Lifecycle.Event.ON_STOP))
+                .subscribe(new CallBackWrapper<String>() {
+                    @Override
+                    public void onSuccess(final String s) {
+                        ifViewAttached(new ViewAction<AboutView>() {
+                            @Override
+                            public void run(@NonNull AboutView view) {
+                                view.loadCommonQuestionsSuccess(s);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(final String msg, final int code) {
+                        ifViewAttached(new ViewAction<AboutView>() {
+                            @Override
+                            public void run(@NonNull AboutView view) {
+                                view.loadCommonQuestionsFailure(msg, code);
                             }
                         });
                     }

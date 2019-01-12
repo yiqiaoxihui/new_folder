@@ -133,16 +133,6 @@ public class PlayVideoPresenter extends MvpBasePresenter<PlayVideoView> implemen
     }
 
     @Override
-    public boolean isNeverAskForWatchDownloadTip() {
-        return dataManager.isNeverAskForWatchDownloadTip();
-    }
-
-    @Override
-    public void setNeverAskForWatchDownloadTip(boolean neverAskForWatchDownloadTip) {
-        dataManager.setNeverAskForWatchDownloadTip(neverAskForWatchDownloadTip);
-    }
-
-    @Override
     public void setFavoriteNeedRefresh(boolean favoriteNeedRefresh) {
         dataManager.setFavoriteNeedRefresh(favoriteNeedRefresh);
     }

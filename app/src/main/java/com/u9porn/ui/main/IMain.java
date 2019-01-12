@@ -1,26 +1,23 @@
 package com.u9porn.ui.main;
 
-import com.u9porn.ui.notice.IBaseNotice;
-
 /**
  * @author flymegoc
  * @date 2017/12/23
  */
 
-public interface IMain extends IBaseNotice {
-    void saveNoticeVersionCode(int versionCode);
+public interface IMain {
 
-    int getIgnoreUpdateVersionCode();
+    void saveNoticeVersionCode(int versionCode);
 
     void setIgnoreUpdateVersionCode(int versionCode);
 
-    void setMainSecondTabShow(int tabId);
+    void setMainSecondTabShow(String tabId);
 
-    int getMainSecondTabShow();
+    String getMainSecondTabShow();
 
-    void setMainFirstTabShow(int tabId);
+    void setMainFirstTabShow(String tabId);
 
-    int getMainFirstTabShow();
+    String getMainFirstTabShow();
 
     boolean haveNotSetF9pornAddress();
 
@@ -35,4 +32,6 @@ public interface IMain extends IBaseNotice {
     void setPorn9VideoAddress(String porn9VideoAddress);
 
     void setPorn9ForumAddress(String porn9ForumAddress);
+
+    boolean isFixMainNavigation();
 }

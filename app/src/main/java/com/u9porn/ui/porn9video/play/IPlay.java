@@ -21,9 +21,5 @@ public interface IPlay extends IBasePlay {
 
     V9PornItem findV9PornItemByViewKey(String viewKey);
 
-    boolean isNeverAskForWatchDownloadTip();
-
-    void setNeverAskForWatchDownloadTip(boolean neverAskForWatchDownloadTip);
-
     void setFavoriteNeedRefresh(boolean favoriteNeedRefresh);
 }

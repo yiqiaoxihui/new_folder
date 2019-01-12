@@ -1,11 +1,10 @@
 package com.u9porn.data.db.entity;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 
 import java.io.Serializable;
-
-import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * 类别
@@ -21,8 +20,8 @@ public class Category implements Serializable {
     public static final String[] CATEGORY_DEFAULT_91PORN_FORUM_NAME = {"主页", "自拍达人原创区", "自拍达人原创申请", "原创自拍区", "我爱我妻", "X趣分享", "两X健康"};
     public static final String[] CATEGORY_DEFAULT_MEI_ZI_TU_VALUE = {"index", "hot", "best", "xinggan", "japan", "taiwan", "mm"};
     public static final String[] CATEGORY_DEFAULT_MEI_ZI_TU_NAME = {"主页", "最热", "推荐", "性感妹子", "日本妹子", "台湾妹子", "清纯妹子"};
-    public static final String[] CATEGORY_DEFAULT_PIG_AV_VALUE = {"index", "熱門", "長片", "每日", "最新", "日韓", "精選"};
-    public static final String[] CATEGORY_DEFAULT_PIG_AV_NAME = {"主页", "热门", "长片", "每日", "最新", "日韩", "精选"};
+    public static final String[] CATEGORY_DEFAULT_PXG_AV_VALUE = {"index", "熱門", "長片", "每日", "最新", "日韓", "精選"};
+    public static final String[] CATEGORY_DEFAULT_PXG_AV_NAME = {"主页", "热门", "长片", "每日", "最新", "日韩", "精选"};
     public static final String[] CATEGORY_DEFAULT_99_MM_VALUE = {"index", "meitui", "xinggan", "qingchun", "hot"};
     public static final String[] CATEGORY_DEFAULT_99_MM_NAME = {"主页", "靓丽腿模", "性感美女", "清纯美女", "美女推荐"};
     public static final String[] CATEGORY_DEFAULT_HUA_BAN_NAME = {"造型美妆", "美食", "旅行", "手工布艺", "健身舞蹈", "儿童", "宠物", "美图", "明星", "美女", "礼物", "极客", "动漫", "建筑设计", "人文艺术", "数据图", "游戏", "汽车摩托", "电影图书", "生活百科", "教育", "运动", "搞笑"};
@@ -33,7 +32,7 @@ public class Category implements Serializable {
     public static final int TYPE_91PORN = 1;
     public static final int TYPE_91PORN_FORUM = 2;
     public static final int TYPE_MEI_ZI_TU = 3;
-    public static final int TYPE_PIG_AV = 4;
+    public static final int TYPE_PXG_AV = 4;
     public static final int TYPE_99_MM = 5;
     public static final int TYPE_HUA_BAN = 6;
     public static final int TYPE_AXGLE=7;

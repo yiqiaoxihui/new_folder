@@ -1,6 +1,7 @@
 package com.u9porn.ui.porn9video.user;
 
 import android.arch.lifecycle.Lifecycle;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
@@ -154,6 +155,34 @@ public class UserPresenter extends MvpBasePresenter<UserView> implements IUser {
         } else {
             dataManager.setPorn9VideoUserAutoLogin(false);
         }
+    }
+
+    @Override
+    public void loadCaptcha() {
+        dataManager.porn9VideoLoginCaptcha()
+                .compose(RxSchedulersHelper.<Bitmap>ioMainThread())
+                .compose(provider.<Bitmap>bindUntilEvent(Lifecycle.Event.ON_STOP))
+                .subscribe(new CallBackWrapper<Bitmap>() {
+                    @Override
+                    public void onSuccess(final Bitmap bitmap) {
+                        ifViewAttached(new ViewAction<UserView>() {
+                            @Override
+                            public void run(@NonNull UserView view) {
+                                view.loadCaptchaSuccess(bitmap);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(final String msg, final int code) {
+                        ifViewAttached(new ViewAction<UserView>() {
+                            @Override
+                            public void run(@NonNull UserView view) {
+                                view.loadCaptchaFailure(msg, code);
+                            }
+                        });
+                    }
+                });
     }
 
     @Override

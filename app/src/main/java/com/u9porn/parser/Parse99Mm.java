@@ -91,30 +91,32 @@ public class Parse99Mm {
         HttpUrl httpUrl = HttpUrl.parse(imgUrl);
         Element element = doc.body().select("script").first();
         String javaScript = element.toString();
-        String data = StringUtils.subString(javaScript, javaScript.indexOf("'") + 1, javaScript.lastIndexOf(";") - 1);
-        String[] ids = data.split(",");
-        if (ids.length == 0) {
-            ids = data.split("%");
-        }
-        Logger.t(TAG).d(ids);
+        String data = StringUtils.subString(javaScript, javaScript.indexOf("[") + 1, javaScript.lastIndexOf(";") - 1);
+        String[] dataArray = data.replace("\"", "").split(",");
 
-        String[] jmImgUrl = {"img", "file"};
+        int imgIdArrayLength = dataArray.length - 6;
+
+        String[] imgIdArray = new String[imgIdArrayLength];
+        System.arraycopy(dataArray, 6, imgIdArray, 0, imgIdArrayLength);
+        Logger.t(TAG).d(dataArray);
+        Logger.t(TAG).d(imgIdArray);
 
         List<String> stringImageList = new ArrayList<>();
-        String jmPicUrl;
-        for (int i = 8; i < ids.length; i++) {
-            if (httpUrl == null) {
-                jmPicUrl = "http://" + jmImgUrl[Integer.parseInt(ids[1])] + ".99mm.net/" + ids[4] + "/" + ids[5] + "/" + (i - 7) + "-" + ids[i].toLowerCase() + ".jpg";
-            } else if (!ids[5].equals("\"n\"")) {
-                jmPicUrl = "http://" + httpUrl.host() + "/" + ids[4] + "/" + ids[5] + "/" + (i - 7) + "-" + ids[i].toLowerCase() + ".jpg";
-            } else {
-                jmPicUrl = "http://" + httpUrl.host() + "/" + ids[1]  + (i - 7) + "-" + ids[i-2].toLowerCase() + ".jpg";
-            }
+        String host;
+        if (httpUrl == null) {
+            host = "http://fj.kanmengmei.com/";
+        } else {
+            host = httpUrl.scheme() +"://"+ httpUrl.host();
+        }
 
-            Logger.t(TAG).d(jmPicUrl);
-            stringImageList.add(jmPicUrl.replace("\"", ""));
+        for (int i = 0; i < imgIdArrayLength; i++) {
+            String tmpImgUrl = host + "/" + dataArray[1] + (i + 1) + "-" + imgIdArray[i] + ".jpg";
+            Logger.t(TAG).d(tmpImgUrl);
+            stringImageList.add(tmpImgUrl);
         }
         return stringImageList;
 
     }
+
+
 }
