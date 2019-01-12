@@ -1,9 +1,9 @@
 {
   "noticeMessage": "
-    当前1.0.7版本因为代码改动，导致没有适配到JiaoZiPlayer播放引擎导致崩溃，所以请使用google exoplayer播放引擎即可，后续基本只会更新升级exoplayer,jiaoziplayer只会修复。
+    当前v1.0.9无法登录9*porn的，请卸载重装（如果已自动升级过，则升级的安装包在Download目录下，否则请手动下载安装）。
   ",
-  "noticeTime": "2018年10月2日",
+  "noticeTime": "2019年01月13日",
    "noticeTitle": "公告",
    "noticeer": "Adimn",
-   "versionCode": 3
+   "versionCode": 4
  }
