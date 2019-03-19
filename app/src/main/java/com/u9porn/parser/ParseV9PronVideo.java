@@ -1,6 +1,7 @@
 package com.u9porn.parser;
 
 import android.text.TextUtils;
+import android.util.Base64;
 
 import com.orhanobut.logger.Logger;
 import com.u9porn.data.db.entity.V9PornItem;
@@ -17,6 +18,8 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author flymegoc
@@ -207,8 +210,23 @@ public class ParseV9PronVideo {
             videoResult.setId(VideoResult.OUT_OF_WATCH_TIMES);
             return videoResult;
         }
-        Document doc = Jsoup.parse(html);
-        String videoUrl = doc.select("video").first().select("source").first().attr("src");
+
+
+        final String reg = "document.write\\(atob\\(\"(.*)\"\\)\\);";
+        Pattern p = Pattern.compile(reg);
+        Matcher m = p.matcher(html);
+        String vidsct = "";
+        if(m.find()){
+            vidsct = m.group(1);
+        }
+        Logger.t(TAG).d("视频base64：" + vidsct);
+
+        String source_str = new String(Base64.decode(vidsct.getBytes(),Base64.DEFAULT));
+        Logger.t(TAG).d("视频source：" + source_str);
+
+//        String videoUrl = doc.select("video").first().select("source").first().attr("src");
+        Document source = Jsoup.parse(source_str);
+        String videoUrl = source.select("source").first().attr("src");
         videoResult.setVideoUrl(videoUrl);
         Logger.t(TAG).d("视频链接：" + videoUrl);
 
@@ -219,6 +237,7 @@ public class ParseV9PronVideo {
         Logger.t(TAG).d("视频Id：" + videoId);
 
         //这里解析的作者id已经变了，非纯数字了
+        Document doc = Jsoup.parse(html);
         String ownerUrl = doc.select("a[href*=UID]").first().attr("href");
         String ownerId = ownerUrl.substring(ownerUrl.indexOf("=") + 1, ownerUrl.length());
         videoResult.setOwnerId(ownerId);
