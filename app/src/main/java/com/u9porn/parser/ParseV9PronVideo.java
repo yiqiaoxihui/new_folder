@@ -212,7 +212,7 @@ public class ParseV9PronVideo {
         }
 
 
-        final String reg = "document.write\\(strencode\\((.+),(.+),.+\\)\\);";
+        final String reg = "document.write\\(strencode\\(\"(.+)\",\"(.+)\",.+\\)\\);";
         Pattern p = Pattern.compile(reg);
         Matcher m = p.matcher(html);
         String param1 = "", param2 = "";
@@ -224,10 +224,11 @@ public class ParseV9PronVideo {
         String source_str = "";
         for (int i = 0,k=0; i<param1.length(); i++) {
             k = i % param2.length();
-            source_str += (char)(param1.codePointAt(i) ^ param2.codePointAt(k));
+            source_str += ""+(char)(param1.codePointAt(i) ^ param2.codePointAt(k));
         }
+        Logger.t(TAG).d("视频source1：" + source_str);
         source_str = new String(Base64.decode(source_str.getBytes(),Base64.DEFAULT));
-        Logger.t(TAG).d("视频source：" + source_str);
+        Logger.t(TAG).d("视频source2：" + source_str);
 
 //        String videoUrl = doc.select("video").first().select("source").first().attr("src");
         Document source = Jsoup.parse(source_str);
