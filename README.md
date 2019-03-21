@@ -17,7 +17,7 @@ rxjava + retrofit + rxcache + mvp + jsoup + dagger2
 
 -----2019年03月22日 v1.1.0
 
-感谢[Cabchinoe](https://github.com/Cabchinoe)提供的最新视频地址解析方法，我个人尝试了另一种方式，即使用一个不可见的WebView加载md5.js，然后调用js解密参数也能实现地址解析
+感谢[Cabchinoe](https://github.com/Cabchinoe)提供的最新9*Porn视频地址解析方法，我个人尝试了另一种方式，即使用一个不可见的WebView加载md5.js，然后调用js解密参数也能实现地址解析
 但是效率相对没有直接代码解析快，可作为备用的方式。
 
 1. 修复9*porn视频无法播放问题 [Cabchinoe](https://github.com/Cabchinoe)
