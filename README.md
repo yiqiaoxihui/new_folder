@@ -17,7 +17,10 @@ rxjava + retrofit + rxcache + mvp + jsoup + dagger2
 
 -----2019年03月22日 v1.1.0
 
-1. 修复9*porn视频无法播放问题
+感谢[Cabchinoe](https://github.com/Cabchinoe)提供的最新视频地址解析方法，我个人尝试了另一种方式，即使用一个不可见的WebView加载md5.js，然后调用js解密参数也能实现地址解析
+但是效率相对没有直接代码解析快，可作为备用的方式。
+
+1. 修复9*porn视频无法播放问题 [Cabchinoe](https://github.com/Cabchinoe)
 2. 修复妹子图列表无法加载问题
 3. 优化论坛帖子内容图片显示问题
 4. 去掉一些依赖，升级了部分库版本，最低api支持为19，即4.4以上
@@ -51,11 +54,11 @@ rxjava + retrofit + rxcache + mvp + jsoup + dagger2
 [更多更新日志...](https://github.com/techGay/v9porn/blob/master/UPGRADE_LOG.md)
 
 
-### APK下载
+### 安装包APK下载
 
-程序带自动检查更新升级功能，如若不能自动更新，在[APK](https://github.com/techGay/v9porn/tree/master/apk)目录手动下载升级即可
+程序带自动检查更新升级功能，如若不能自动更新，在[APK](https://github.com/techGay/v9porn/tree/master/apk)目录或者[released](https://github.com/techGay/v9porn/releases)界面手动下载升级即可
 
-### 编译环境
+### 自行编译--编译环境
 
 请用最新版AndroidStudio（至少3.0以上），个人本地基本都是有更新就更新
 
@@ -78,6 +81,9 @@ Windows 10 10.0
  ------------- | -------------
  ![赞赏](https://github.com/techGay/v9porn/blob/master/img/mm_reward_qrcode_1547141812376.png) | ![赞赏](https://github.com/techGay/v9porn/blob/master/img/alipay1547141972480.jpg) 
 
+### 赞赏&打赏列表
+
+[....列表](https://github.com/techGay/v9porn/blob/master/REWARD.md)
 
 ### 声明
 本项目仅做技术交流使用，任何人或组织无论以何种形式将其用在其他任何地方由此引发的各种问题均与本人无关
