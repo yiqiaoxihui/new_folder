@@ -7,10 +7,10 @@ android {
     buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.u9porn"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 27
-        versionCode 10
-        versionName "1.0.9"
+        versionCode 11
+        versionName "1.1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -34,6 +34,10 @@ android {
         // but continue the build even when errors are found:
         abortOnError false
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 greendao {
@@ -41,9 +45,9 @@ greendao {
 }
 
 bugly {
-    appId = "$rootProject.appId" // 注册时分配的App ID
-    appKey = " $rootProject.appKey" // 注册时分配的App Key
-    appVersion = '1.0.9' //App版本
+    appId = "" // 注册时分配的App ID
+    appKey = "" // 注册时分配的App Key
+    appVersion = '1.1.0' //App版本
     execute = true //插件开关
     upload = true //上传开关
     uploadMapping = true //Mapping文件上传开关
@@ -70,17 +74,17 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
-    implementation 'com.squareup.retrofit2:converter-scalars:2.4.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.5.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
     // jsoup HTML parser library @ https://jsoup.org/
     implementation 'org.jsoup:jsoup:1.11.3'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.40'
     // code generator for view
     implementation "com.jakewharton:butterknife:$rootProject.butterKnifeVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.12'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.3'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.github.franmontiel:PersistentCookieJar:v1.0.1'
     implementation 'com.orhanobut:logger:2.2.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
@@ -136,10 +140,7 @@ dependencies {
         exclude group: 'com.android.support'
     }
     implementation project(':exolibrary')
-
     implementation 'com.tencent.bugly:crashreport:2.6.6.1'
     implementation 'com.tencent.bugly:nativecrashreport:3.3.1'
-    implementation 'com.aliyun.ams:alicloud-android-hotfix:3.2.6'
-
     implementation "ru.noties:markwon:$rootProject.markwonVersion"
 }

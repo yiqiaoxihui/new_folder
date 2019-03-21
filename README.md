@@ -3,17 +3,26 @@
 
 ### 目前具备功能
 1. 无限制观看（绝大部分用户）
-2. 登录注册收藏功能
+2. 登录收藏功能
 3. 下载视频
 4. 额外的图片板块以及其他视频板块
 5. 浏览论坛帖子功能
 
 ### 技术概览
-rxjava+retrofit+rxcache+mvp+jsoup+dagger2
+rxjava + retrofit + rxcache + mvp + jsoup + dagger2
 
 时间能力有限，欢迎各位提交PR
 
 ### 更新日志：
+
+-----2019年03月22日 v1.1.0
+
+1. 修复9*porn视频无法播放问题
+2. 修复妹子图列表无法加载问题
+3. 优化论坛帖子内容图片显示问题
+4. 去掉一些依赖，升级了部分库版本，最低api支持为19，即4.4以上
+6. 其他改动调整及bug修复
+
 
 -----2019年01月13日 v1.0.9
 
@@ -52,11 +61,11 @@ rxjava+retrofit+rxcache+mvp+jsoup+dagger2
 
 当前版本：
 
-Android Studio 3.2.1
+Android Studio 3.3.2
 
-Build #AI-181.5540.7.32.5056338, built on October 9, 2018
+Build #AI-182.5107.16.33.5314842, built on February 16, 2019
 
-JRE: 1.8.0_152-release-1136-b06 amd64
+JRE: 1.8.0_152-release-1248-b01 amd64
 
 JVM: OpenJDK 64-Bit Server VM by JetBrains s.r.o
 
@@ -65,8 +74,10 @@ Windows 10 10.0
 ### 其他
 觉得项目不错，给个start或赞赏，请我喝杯咖啡：
 
-![赞赏](https://github.com/techGay/v9porn/blob/master/img/mm_reward_qrcode_1547141812376.png)
-![赞赏](https://github.com/techGay/v9porn/blob/master/img/alipay1547141972480.jpg)
+ 微信 | 支付宝 
+ ------------- | -------------
+ ![赞赏](https://github.com/techGay/v9porn/blob/master/img/mm_reward_qrcode_1547141812376.png) | ![赞赏](https://github.com/techGay/v9porn/blob/master/img/alipay1547141972480.jpg) 
+
 
 ### 声明
 本项目仅做技术交流使用，任何人或组织无论以何种形式将其用在其他任何地方由此引发的各种问题均与本人无关

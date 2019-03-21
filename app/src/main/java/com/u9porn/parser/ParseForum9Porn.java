@@ -18,6 +18,8 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.HttpUrl;
+
 /**
  * @author flymegoc
  * @date 2018/1/23
@@ -203,9 +205,18 @@ public class ParseForum9Porn {
             address = StringUtils.subString(href, 0, href.indexOf("archiver"));
         }
         //如果成功解析到地址且和原地址不同，则替换
+
         if (!TextUtils.isEmpty(address) && !address.equals(baseUrl)) {
-            baseUrl = address;
-            Logger.t(TAG).e("替换地址为::::" + address);
+            HttpUrl newUrl = HttpUrl.parse(address);
+            HttpUrl oldUrl = HttpUrl.parse(baseUrl);
+            //要区分http 和https ,只比对域名部分
+            if (newUrl != null && oldUrl != null && !newUrl.host().equals(oldUrl.host())) {
+                baseUrl = address;
+                Logger.t(TAG).e("替换前缀地址为::::" + baseUrl);
+            }else {
+                Logger.t(TAG).e("域名一致，无需替换::::" + baseUrl);
+            }
+
         }
         Element content = doc.getElementsByClass("t_msgfontfix").first();
 
@@ -252,6 +263,7 @@ public class ParseForum9Porn {
                 element.attr("src", imgUrl);
                 stringList.add(imgUrl);
             }
+            Logger.t(TAG).e("最终图片地址::::" + imgUrl);
             element.attr("width", "100%");
             element.attr("style", "margin-top: 1em;");
             element.attr("alt", "[图片无法加载...]");
